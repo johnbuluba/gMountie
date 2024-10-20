@@ -1,0 +1,92 @@
+syntax = "proto3";
+package grpc_fs;
+
+message GetAttrRequest {
+  string path = 1;
+}
+
+enum FileType {
+  REGULAR = 0;
+  DIRECTORY = 1;
+}
+
+message Attr {
+  uint64 inode = 1;
+  uint64 size = 2;
+  uint64 blocks = 3;
+  FileType kind = 4;
+  uint32 permission = 5;
+  uint32 nlink = 6;
+  uint32 uid = 7;
+  uint32 gid = 8;
+  uint32 rdev = 9;
+  uint32 blksize = 10;
+}
+
+message GetAttrReply {
+  Attr attributes = 1;
+}
+
+message LookUpRequest {
+  string path = 1;
+}
+
+message LookUpReply {
+  Attr attributes = 1;
+}
+
+message ReadDirRequest {
+  string path = 1;
+  int64 offset = 2;
+}
+
+message DEntry {
+  uint64 inode = 1;
+  uint64 offset = 2;
+  string file_name = 3;
+  FileType kind = 4;
+}
+
+message ReadDirReply {
+  repeated DEntry entries = 1;
+}
+
+message DEntryPlus {
+  uint64 inode = 1;
+  uint64 offset = 2;
+  string name = 3;
+  FileType kind = 4;
+  optional Attr attr = 5;
+}
+
+message ReadDirPlusReply {
+  repeated DEntryPlus entries = 1;
+}
+
+message OpenRequest {
+  string path = 1;
+  uint32 flags = 2;
+}
+
+message OpenReply {
+  int32 fd = 1;
+}
+
+message ReadRequest {
+  string path = 1;
+  int64 size = 2;
+  uint64 offset = 3;
+}
+
+message ReadReply {
+  bytes data = 1;
+}
+
+service RpcFs {
+  rpc GetAttr (GetAttrRequest) returns (GetAttrReply);
+  rpc LookUp (LookUpRequest) returns (LookUpReply);
+  rpc ReadDir (ReadDirRequest) returns (ReadDirReply);
+  rpc ReadDirPlus (ReadDirRequest) returns (ReadDirPlusReply);
+  rpc Open (OpenRequest) returns (OpenReply);
+  rpc Read (ReadRequest) returns (ReadReply);
+}
