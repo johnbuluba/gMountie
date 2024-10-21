@@ -1,37 +1,36 @@
 package main
 
 import (
-	"fmt"
-	"grpc-fs/pkg/server"
+	"grpc-fs/pkg/server/config"
+	"grpc-fs/pkg/server/grpc"
+	"grpc-fs/pkg/server/io"
 	"log"
-	"net"
-
-	pb "grpc-fs/pkg/proto"
 
 	"github.com/hanwen/go-fuse/v2/fuse/pathfs"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
+	"github.com/pkg/errors"
 )
+
+const Config = `
+server:
+  address: 127.0.0.1
+volumes:
+- name: test
+  path: /home/john/mnt/test
+`
 
 // Start the gRPC server
 func Start() error {
-	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", 8085))
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
-	var opts []grpc.ServerOption
-	grpcServer := grpc.NewServer(opts...)
-
+	cfg, err := config.LoadConfigFromString(Config)
 	if err != nil {
 		return err
 	}
-	fs := pathfs.NewLoopbackFileSystem("/home/john/mnt/test")
+
+	fs := pathfs.NewLoopbackFileSystem(cfg.Volumes[0].Path)
 	fs = pathfs.NewLockingFileSystem(fs)
-	pb.RegisterRpcFsServer(grpcServer, server.NewGrpcServer(fs))
-	pb.RegisterRpcFileServer(grpcServer, server.NewRpcFileServer(fs))
-	reflection.Register(grpcServer)
-	if err = grpcServer.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
+	server := grpc.NewServer(&cfg, []grpc.ServiceRegistrar{io.NewGrpcServer(fs), io.NewRpcFileServer(fs)})
+
+	if err = server.Serve(); err != nil {
+		return errors.Wrap(err, "failed to start server")
 	}
 	return nil
 }

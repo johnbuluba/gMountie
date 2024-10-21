@@ -51,7 +51,7 @@ func main() {
 		})
 	server, err := fuse.NewServer(
 		connector.RawFS(), flag.Arg(0), &fuse.MountOptions{
-			SingleThreaded: false,
+			SingleThreaded: true,
 			Debug:          true,
 		})
 	if err != nil {

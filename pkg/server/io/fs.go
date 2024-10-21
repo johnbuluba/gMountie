@@ -1,14 +1,13 @@
-package server
+package io
 
 import (
 	"context"
-	"grpc-fs/pkg/common"
 	"grpc-fs/pkg/proto"
 	"os"
 
 	"github.com/hanwen/go-fuse/v2/fuse"
 	"github.com/hanwen/go-fuse/v2/fuse/pathfs"
-	"go.uber.org/zap"
+	"google.golang.org/grpc"
 )
 
 type RpcServerImpl struct {
@@ -23,10 +22,12 @@ func NewGrpcServer(filesystem pathfs.FileSystem) *RpcServerImpl {
 	}
 }
 
+// Register registers the gRPC server
+func (r *RpcServerImpl) Register(server *grpc.Server) {
+	proto.RegisterRpcFsServer(server, r)
+}
+
 func (r *RpcServerImpl) GetAttr(ctx context.Context, request *proto.GetAttrRequest) (*proto.GetAttrReply, error) {
-	common.Log.Debug("rpc: GetAttr",
-		zap.String("path", request.Path),
-	)
 	attr, status := r.filesystem.GetAttr(request.Path, createContext(ctx))
 	if attr == nil {
 		return &proto.GetAttrReply{
@@ -57,9 +58,6 @@ func (r *RpcServerImpl) GetAttr(ctx context.Context, request *proto.GetAttrReque
 }
 
 func (r *RpcServerImpl) OpenDir(ctx context.Context, request *proto.OpenDirRequest) (*proto.OpenDirReply, error) {
-	common.Log.Debug("rpc: OpenDir",
-		zap.String("path", request.Path),
-	)
 	dirs, s := r.filesystem.OpenDir(request.Path, createContext(ctx))
 	// convert to proto.DirEntry
 	entries := make([]*proto.DirEntry, len(dirs))
@@ -79,9 +77,6 @@ func (r *RpcServerImpl) OpenDir(ctx context.Context, request *proto.OpenDirReque
 }
 
 func (r *RpcServerImpl) StatFs(ctx context.Context, request *proto.StatFsRequest) (*proto.StatFsReply, error) {
-	common.Log.Debug("rpc: StatFs",
-		zap.String("path", request.Path),
-	)
 	statfs := r.filesystem.StatFs(request.Path)
 	reply := &proto.StatFsReply{
 		Blocks:  statfs.Blocks,
@@ -98,9 +93,6 @@ func (r *RpcServerImpl) StatFs(ctx context.Context, request *proto.StatFsRequest
 
 // Unlink removes a file
 func (r *RpcServerImpl) Unlink(ctx context.Context, request *proto.UnlinkRequest) (*proto.UnlinkReply, error) {
-	common.Log.Debug("rpc: Unlink",
-		zap.String("path", request.Path),
-	)
 	status := r.filesystem.Unlink(request.Path, createContext(ctx))
 	return &proto.UnlinkReply{Status: int32(status)}, nil
 }

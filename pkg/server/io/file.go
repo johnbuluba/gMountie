@@ -1,15 +1,14 @@
-package server
+package io
 
 import (
 	"context"
 	"errors"
-	"grpc-fs/pkg/common"
 	"grpc-fs/pkg/proto"
 
 	"github.com/hanwen/go-fuse/v2/fuse"
 	"github.com/hanwen/go-fuse/v2/fuse/nodefs"
 	"github.com/hanwen/go-fuse/v2/fuse/pathfs"
-	"go.uber.org/zap"
+	"google.golang.org/grpc"
 )
 
 type fileEntry struct {
@@ -30,8 +29,12 @@ func NewRpcFileServer(filesystem pathfs.FileSystem) *RpcFileServerImpl {
 	}
 }
 
+// Register registers the gRPC server
+func (r *RpcFileServerImpl) Register(server *grpc.Server) {
+	proto.RegisterRpcFileServer(server, r)
+}
+
 func (r *RpcFileServerImpl) Open(ctx context.Context, request *proto.OpenRequest) (*proto.OpenReply, error) {
-	common.Log.Debug("rpc: Open", zap.String("path", request.Path), zap.Uint32("flags", request.Flags))
 	fd, status := r.filesystem.Open(request.Path, request.Flags, createContext(ctx))
 	reply := &proto.OpenReply{
 		Status: int32(status),
@@ -41,11 +44,6 @@ func (r *RpcFileServerImpl) Open(ctx context.Context, request *proto.OpenRequest
 }
 
 func (r *RpcFileServerImpl) Create(ctx context.Context, request *proto.CreateRequest) (*proto.CreateReply, error) {
-	common.Log.Debug("rpc: Create",
-		zap.String("path", request.Path),
-		zap.Uint32("flags", request.Flags),
-		zap.Uint32("mode", request.Mode),
-	)
 	fd, status := r.filesystem.Create(request.Path, request.Flags, request.Mode, createContext(ctx))
 	reply := &proto.CreateReply{
 		Status: int32(status),
@@ -55,11 +53,6 @@ func (r *RpcFileServerImpl) Create(ctx context.Context, request *proto.CreateReq
 }
 
 func (r *RpcFileServerImpl) Read(ctx context.Context, request *proto.ReadRequest) (*proto.ReadReply, error) {
-	common.Log.Debug("rpc: Read",
-		zap.String("path", request.Path),
-		zap.Uint32("size", request.Size),
-		zap.Int64("offset", request.Offset),
-	)
 	file, err := r.getFile(request.Path)
 	if err != nil {
 		return nil, err
@@ -81,10 +74,6 @@ func (r *RpcFileServerImpl) Read(ctx context.Context, request *proto.ReadRequest
 }
 
 func (r *RpcFileServerImpl) Write(ctx context.Context, request *proto.WriteRequest) (*proto.WriteReply, error) {
-	common.Log.Debug("rpc: Write",
-		zap.String("path", request.Path),
-		zap.Int64("offset", request.Offset),
-	)
 	file, err := r.getFile(request.Path)
 	if err != nil {
 		return nil, err
