@@ -1,0 +1,53 @@
+image: golang:1.23
+
+
+
+stages:
+  - test
+  - build
+
+test:
+  stage: test
+  variables:
+    TEST_EXTRA_ARGS: "-coverpkg=./... -coverprofile=$CI_PROJECT_DIR/reports/coverage.txt -covermode count"
+  before_script:
+    - export GOPATH="$CI_PROJECT_DIR/.cache"
+    - export PATH="$GOPATH/bin:$PATH"
+    - env GOBIN=/bin go install github.com/go-task/task/v3/cmd/task@latest
+  script:
+    - mkdir -p .cache
+    - mkdir -p ./reports
+    - task test
+    - go get github.com/boumenot/gocover-cobertura
+    - go run github.com/boumenot/gocover-cobertura < $CI_PROJECT_DIR/reports/coverage.txt > $CI_PROJECT_DIR/reports/coverage.xml
+    - TOTAL=$(go tool cover -func $CI_PROJECT_DIR/reports/coverage.txt | grep total | awk '{print $3}')
+    - echo "coverage $TOTAL of statements in"
+  coverage: '/coverage \d+.\d+% of statements/'
+  cache:
+    - key:
+        files:
+          - go.sum
+      paths:
+        - .cache
+  artifacts:
+    paths:
+      - reports/coverage.xml
+      - reports/coverage.txt
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: reports/coverage.xml
+
+build:
+  stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [ "" ]
+  script:
+    - /kaniko/executor
+      --cache=true
+      --context "${CI_PROJECT_DIR}"
+      --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
+      --target=server
+      --destination "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}"
+      --destination "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}"

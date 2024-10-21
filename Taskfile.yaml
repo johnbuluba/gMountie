@@ -8,7 +8,7 @@ tasks:
 
   test:
     cmds:
-      - go test -p=1 ./... $TEST_EXTRA_A
+      - go test -p=1 ./... $TEST_EXTRA_ARGS
 
   build:server:
     cmds:
