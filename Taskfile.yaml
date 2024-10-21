@@ -1,7 +1,7 @@
 version: '3'
 
 tasks:
-  hello:
+  gen-grpc:
     cmds:
-      - echo 'Hello World from Task!'
-    silent: true
+      - | 
+        protoc --go_out=. --go-grpc_out=. api/proto/*.proto

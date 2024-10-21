@@ -1,0 +1,89 @@
+syntax = "proto3";
+package grpc_fs;
+option go_package = "pkg/proto";
+
+message Owner {
+  uint32 uid = 1;
+  uint32 gid = 2;
+
+}
+
+message DirEntry {
+  uint32 mode = 1;
+  string name = 2;
+  uint64 ino = 3;
+  uint64 off = 4;
+}
+
+message Attr {
+  uint64 ino = 1;
+  uint64 size = 2;
+  uint64 blocks = 3;
+  uint64 atime = 4;
+  uint64 mtime = 5;
+  uint64 ctime = 6;
+  uint32 atimensec = 7;
+  uint32 mtimensec = 8;
+  uint32 ctimensec = 9;
+  uint32 mode = 10;
+  uint32 nlink = 11;
+  Owner owner = 12;
+  uint32 uid = 13;
+  uint32 gid = 14;
+  uint32 rdev = 15;
+  uint32 blksize = 16;
+  uint32 padding = 17;
+}
+
+message StatFsRequest {
+  string path = 1;
+}
+
+message StatFsReply {
+  uint64 blocks = 1;
+  uint64 bfree = 2;
+  uint64 bavail = 3;
+  uint64 files = 4;
+  uint64 ffree = 5;
+  uint32 bsize = 6;
+  uint32 namelen = 7;
+  uint32 frsize = 8;
+  uint32 padding = 9;
+  repeated uint32 spare = 10 [packed = true];
+}
+
+
+message GetAttrRequest {
+  string path = 1;
+}
+
+message GetAttrReply {
+  Attr attributes = 1;
+  int32 status = 2;
+}
+
+message OpenDirRequest {
+  string path = 1;
+}
+
+message OpenDirReply {
+  repeated DirEntry entries = 1;
+  int32 status = 2;
+}
+
+message UnlinkRequest {
+  string path = 1;
+}
+
+message UnlinkReply {
+  int32 status = 1;
+}
+
+
+service RpcFs {
+  rpc GetAttr (GetAttrRequest) returns (GetAttrReply);
+  rpc StatFs (StatFsRequest) returns (StatFsReply);
+  rpc OpenDir (OpenDirRequest) returns (OpenDirReply);
+  rpc Unlink (UnlinkRequest) returns (UnlinkReply);
+}
+
