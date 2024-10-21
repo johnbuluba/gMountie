@@ -22,6 +22,10 @@ type RpcFileServerImpl struct {
 	proto.UnimplementedRpcFileServer
 }
 
+// Verify that RpcFileServerImpl implements proto.RpcFileServer
+var _ proto.RpcFileServer = (*RpcFileServerImpl)(nil)
+
+// NewRpcFileServer creates a new RpcFileServerImpl
 func NewRpcFileServer(filesystem pathfs.FileSystem) *RpcFileServerImpl {
 	return &RpcFileServerImpl{
 		filesystem: filesystem,

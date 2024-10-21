@@ -26,6 +26,12 @@ type RpcFsClient interface {
 	StatFs(ctx context.Context, in *StatFsRequest, opts ...grpc.CallOption) (*StatFsReply, error)
 	OpenDir(ctx context.Context, in *OpenDirRequest, opts ...grpc.CallOption) (*OpenDirReply, error)
 	Unlink(ctx context.Context, in *UnlinkRequest, opts ...grpc.CallOption) (*UnlinkReply, error)
+	Access(ctx context.Context, in *AccessRequest, opts ...grpc.CallOption) (*AccessReply, error)
+	Truncate(ctx context.Context, in *TruncateRequest, opts ...grpc.CallOption) (*TruncateReply, error)
+	Chown(ctx context.Context, in *ChownRequest, opts ...grpc.CallOption) (*ChownReply, error)
+	Chmod(ctx context.Context, in *ChmodRequest, opts ...grpc.CallOption) (*ChmodReply, error)
+	Mkdir(ctx context.Context, in *MkdirRequest, opts ...grpc.CallOption) (*MkdirReply, error)
+	Rmdir(ctx context.Context, in *RmdirRequest, opts ...grpc.CallOption) (*RmdirReply, error)
 }
 
 type rpcFsClient struct {
@@ -72,6 +78,60 @@ func (c *rpcFsClient) Unlink(ctx context.Context, in *UnlinkRequest, opts ...grp
 	return out, nil
 }
 
+func (c *rpcFsClient) Access(ctx context.Context, in *AccessRequest, opts ...grpc.CallOption) (*AccessReply, error) {
+	out := new(AccessReply)
+	err := c.cc.Invoke(ctx, "/grpc_fs.RpcFs/Access", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *rpcFsClient) Truncate(ctx context.Context, in *TruncateRequest, opts ...grpc.CallOption) (*TruncateReply, error) {
+	out := new(TruncateReply)
+	err := c.cc.Invoke(ctx, "/grpc_fs.RpcFs/Truncate", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *rpcFsClient) Chown(ctx context.Context, in *ChownRequest, opts ...grpc.CallOption) (*ChownReply, error) {
+	out := new(ChownReply)
+	err := c.cc.Invoke(ctx, "/grpc_fs.RpcFs/Chown", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *rpcFsClient) Chmod(ctx context.Context, in *ChmodRequest, opts ...grpc.CallOption) (*ChmodReply, error) {
+	out := new(ChmodReply)
+	err := c.cc.Invoke(ctx, "/grpc_fs.RpcFs/Chmod", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *rpcFsClient) Mkdir(ctx context.Context, in *MkdirRequest, opts ...grpc.CallOption) (*MkdirReply, error) {
+	out := new(MkdirReply)
+	err := c.cc.Invoke(ctx, "/grpc_fs.RpcFs/Mkdir", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *rpcFsClient) Rmdir(ctx context.Context, in *RmdirRequest, opts ...grpc.CallOption) (*RmdirReply, error) {
+	out := new(RmdirReply)
+	err := c.cc.Invoke(ctx, "/grpc_fs.RpcFs/Rmdir", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RpcFsServer is the server API for RpcFs service.
 // All implementations must embed UnimplementedRpcFsServer
 // for forward compatibility
@@ -80,6 +140,12 @@ type RpcFsServer interface {
 	StatFs(context.Context, *StatFsRequest) (*StatFsReply, error)
 	OpenDir(context.Context, *OpenDirRequest) (*OpenDirReply, error)
 	Unlink(context.Context, *UnlinkRequest) (*UnlinkReply, error)
+	Access(context.Context, *AccessRequest) (*AccessReply, error)
+	Truncate(context.Context, *TruncateRequest) (*TruncateReply, error)
+	Chown(context.Context, *ChownRequest) (*ChownReply, error)
+	Chmod(context.Context, *ChmodRequest) (*ChmodReply, error)
+	Mkdir(context.Context, *MkdirRequest) (*MkdirReply, error)
+	Rmdir(context.Context, *RmdirRequest) (*RmdirReply, error)
 	mustEmbedUnimplementedRpcFsServer()
 }
 
@@ -98,6 +164,24 @@ func (UnimplementedRpcFsServer) OpenDir(context.Context, *OpenDirRequest) (*Open
 }
 func (UnimplementedRpcFsServer) Unlink(context.Context, *UnlinkRequest) (*UnlinkReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Unlink not implemented")
+}
+func (UnimplementedRpcFsServer) Access(context.Context, *AccessRequest) (*AccessReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Access not implemented")
+}
+func (UnimplementedRpcFsServer) Truncate(context.Context, *TruncateRequest) (*TruncateReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Truncate not implemented")
+}
+func (UnimplementedRpcFsServer) Chown(context.Context, *ChownRequest) (*ChownReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Chown not implemented")
+}
+func (UnimplementedRpcFsServer) Chmod(context.Context, *ChmodRequest) (*ChmodReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Chmod not implemented")
+}
+func (UnimplementedRpcFsServer) Mkdir(context.Context, *MkdirRequest) (*MkdirReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Mkdir not implemented")
+}
+func (UnimplementedRpcFsServer) Rmdir(context.Context, *RmdirRequest) (*RmdirReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Rmdir not implemented")
 }
 func (UnimplementedRpcFsServer) mustEmbedUnimplementedRpcFsServer() {}
 
@@ -184,6 +268,114 @@ func _RpcFs_Unlink_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RpcFs_Access_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AccessRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RpcFsServer).Access(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpc_fs.RpcFs/Access",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RpcFsServer).Access(ctx, req.(*AccessRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RpcFs_Truncate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TruncateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RpcFsServer).Truncate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpc_fs.RpcFs/Truncate",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RpcFsServer).Truncate(ctx, req.(*TruncateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RpcFs_Chown_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ChownRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RpcFsServer).Chown(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpc_fs.RpcFs/Chown",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RpcFsServer).Chown(ctx, req.(*ChownRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RpcFs_Chmod_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ChmodRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RpcFsServer).Chmod(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpc_fs.RpcFs/Chmod",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RpcFsServer).Chmod(ctx, req.(*ChmodRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RpcFs_Mkdir_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MkdirRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RpcFsServer).Mkdir(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpc_fs.RpcFs/Mkdir",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RpcFsServer).Mkdir(ctx, req.(*MkdirRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RpcFs_Rmdir_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RmdirRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RpcFsServer).Rmdir(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpc_fs.RpcFs/Rmdir",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RpcFsServer).Rmdir(ctx, req.(*RmdirRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // RpcFs_ServiceDesc is the grpc.ServiceDesc for RpcFs service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -206,6 +398,30 @@ var RpcFs_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Unlink",
 			Handler:    _RpcFs_Unlink_Handler,
+		},
+		{
+			MethodName: "Access",
+			Handler:    _RpcFs_Access_Handler,
+		},
+		{
+			MethodName: "Truncate",
+			Handler:    _RpcFs_Truncate_Handler,
+		},
+		{
+			MethodName: "Chown",
+			Handler:    _RpcFs_Chown_Handler,
+		},
+		{
+			MethodName: "Chmod",
+			Handler:    _RpcFs_Chmod_Handler,
+		},
+		{
+			MethodName: "Mkdir",
+			Handler:    _RpcFs_Mkdir_Handler,
+		},
+		{
+			MethodName: "Rmdir",
+			Handler:    _RpcFs_Rmdir_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

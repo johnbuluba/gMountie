@@ -79,11 +79,70 @@ message UnlinkReply {
   int32 status = 1;
 }
 
+message AccessRequest {
+  string path = 1;
+  uint32 mode = 2;
+}
+
+message AccessReply {
+  int32 status = 1;
+}
+
+message TruncateRequest {
+  string path = 1;
+  uint64 size = 2;
+}
+
+message TruncateReply {
+  int32 status = 1;
+}
+
+message ChownRequest {
+  string path = 1;
+  uint32 uid = 2;
+  uint32 gid = 3;
+}
+
+message ChownReply {
+  int32 status = 1;
+}
+
+message ChmodRequest {
+  string path = 1;
+  uint32 mode = 2;
+}
+
+message ChmodReply {
+  int32 status = 1;
+}
+
+message MkdirRequest {
+  string path = 1;
+  uint32 mode = 2;
+}
+
+message MkdirReply {
+  int32 status = 1;
+}
+
+message RmdirRequest {
+  string path = 1;
+}
+
+message RmdirReply {
+  int32 status = 1;
+}
 
 service RpcFs {
   rpc GetAttr (GetAttrRequest) returns (GetAttrReply);
   rpc StatFs (StatFsRequest) returns (StatFsReply);
   rpc OpenDir (OpenDirRequest) returns (OpenDirReply);
   rpc Unlink (UnlinkRequest) returns (UnlinkReply);
+  rpc Access (AccessRequest) returns (AccessReply);
+  rpc Truncate (TruncateRequest) returns (TruncateReply);
+  rpc Chown (ChownRequest) returns (ChownReply);
+  rpc Chmod (ChmodRequest) returns (ChmodReply);
+  rpc Mkdir (MkdirRequest) returns (MkdirReply);
+  rpc Rmdir (RmdirRequest) returns (RmdirReply);
 }
 

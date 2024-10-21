@@ -26,7 +26,7 @@ func Start() error {
 	}
 
 	fs := pathfs.NewLoopbackFileSystem(cfg.Volumes[0].Path)
-	fs = pathfs.NewLockingFileSystem(fs)
+	//fs = pathfs.NewLockingFileSystem(fs)
 	server := grpc.NewServer(&cfg, []grpc.ServiceRegistrar{io.NewGrpcServer(fs), io.NewRpcFileServer(fs)})
 
 	if err = server.Serve(); err != nil {

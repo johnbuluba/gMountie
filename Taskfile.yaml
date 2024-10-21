@@ -5,3 +5,7 @@ tasks:
     cmds:
       - | 
         protoc --go_out=. --go-grpc_out=. api/proto/*.proto
+
+  test:
+    cmds:
+      - go test -p=1 ./... $TEST_EXTRA_A

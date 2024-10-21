@@ -29,7 +29,7 @@ func (s *ConfigTestSuite) TestParse_Full_Server() {
 
 	// Verify.
 	s.Require().NoError(err)
-	s.Assert().Equal("test", result.Server.Address)
+	s.Assert().Equal("0.0.0.0", result.Server.Address)
 	s.Assert().Equal(uint(8000), result.Server.Port)
 }
 

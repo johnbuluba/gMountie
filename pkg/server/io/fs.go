@@ -15,6 +15,9 @@ type RpcServerImpl struct {
 	proto.UnimplementedRpcFsServer
 }
 
+// Verify that RpcServerImpl implements proto.RpcFsServer
+var _ proto.RpcFsServer = (*RpcServerImpl)(nil)
+
 // NewGrpcServer creates a new gRPC server
 func NewGrpcServer(filesystem pathfs.FileSystem) *RpcServerImpl {
 	return &RpcServerImpl{
@@ -57,6 +60,19 @@ func (r *RpcServerImpl) GetAttr(ctx context.Context, request *proto.GetAttrReque
 	return reply, nil
 }
 
+// Mkdir creates a new directory
+func (r *RpcServerImpl) Mkdir(ctx context.Context, request *proto.MkdirRequest) (*proto.MkdirReply, error) {
+	status := r.filesystem.Mkdir(request.Path, request.Mode, createContext(ctx))
+	return &proto.MkdirReply{Status: int32(status)}, nil
+}
+
+// Rmdir removes a directory
+func (r *RpcServerImpl) Rmdir(ctx context.Context, request *proto.RmdirRequest) (*proto.RmdirReply, error) {
+	status := r.filesystem.Rmdir(request.Path, createContext(ctx))
+	return &proto.RmdirReply{Status: int32(status)}, nil
+}
+
+// OpenDir opens a directory
 func (r *RpcServerImpl) OpenDir(ctx context.Context, request *proto.OpenDirRequest) (*proto.OpenDirReply, error) {
 	dirs, s := r.filesystem.OpenDir(request.Path, createContext(ctx))
 	// convert to proto.DirEntry
@@ -95,6 +111,30 @@ func (r *RpcServerImpl) StatFs(ctx context.Context, request *proto.StatFsRequest
 func (r *RpcServerImpl) Unlink(ctx context.Context, request *proto.UnlinkRequest) (*proto.UnlinkReply, error) {
 	status := r.filesystem.Unlink(request.Path, createContext(ctx))
 	return &proto.UnlinkReply{Status: int32(status)}, nil
+}
+
+// Access checks if a file can be accessed
+func (r *RpcServerImpl) Access(ctx context.Context, request *proto.AccessRequest) (*proto.AccessReply, error) {
+	status := r.filesystem.Access(request.Path, request.Mode, createContext(ctx))
+	return &proto.AccessReply{Status: int32(status)}, nil
+}
+
+// Truncate changes the size of a file
+func (r *RpcServerImpl) Truncate(ctx context.Context, request *proto.TruncateRequest) (*proto.TruncateReply, error) {
+	status := r.filesystem.Truncate(request.Path, request.Size, createContext(ctx))
+	return &proto.TruncateReply{Status: int32(status)}, nil
+}
+
+// Chmod changes the mode of a file
+func (r *RpcServerImpl) Chmod(ctx context.Context, request *proto.ChmodRequest) (*proto.ChmodReply, error) {
+	status := r.filesystem.Chmod(request.Path, request.Mode, createContext(ctx))
+	return &proto.ChmodReply{Status: int32(status)}, nil
+}
+
+// Chown changes the owner of a file
+func (r *RpcServerImpl) Chown(ctx context.Context, request *proto.ChownRequest) (*proto.ChownReply, error) {
+	status := r.filesystem.Chown(request.Path, request.Uid, request.Gid, createContext(ctx))
+	return &proto.ChownReply{Status: int32(status)}, nil
 }
 
 // createContext creates a new fuse.Context from the given context.Context
