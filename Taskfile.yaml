@@ -9,3 +9,8 @@ tasks:
   test:
     cmds:
       - go test -p=1 ./... $TEST_EXTRA_A
+
+  build:server:
+    cmds:
+      - go build -o out/server cmd/server/main.go
+

@@ -1,10 +1,12 @@
 package main
 
 import (
+	"flag"
+	"grpc-fs/pkg/common"
 	"grpc-fs/pkg/server/config"
 	"grpc-fs/pkg/server/grpc"
 	"grpc-fs/pkg/server/io"
-	"log"
+	"os"
 
 	"github.com/hanwen/go-fuse/v2/fuse/pathfs"
 	"github.com/pkg/errors"
@@ -19,8 +21,8 @@ volumes:
 `
 
 // Start the gRPC server
-func Start() error {
-	cfg, err := config.LoadConfigFromString(Config)
+func Start(cfgString string) error {
+	cfg, err := config.LoadConfigFromString(cfgString)
 	if err != nil {
 		return err
 	}
@@ -37,8 +39,20 @@ func Start() error {
 
 // Main function
 func main() {
-	err := Start()
+	flag.Parse()
+	cfg := Config
+	if len(flag.Args()) == 1 {
+		data, err := os.ReadFile(flag.Arg(0))
+		if err != nil {
+			common.Log.Sugar().Fatalf("failed to read config file: %v", err)
+		}
+		cfg = string(data)
+	} else {
+		common.Log.Info("using default configuration")
+	}
+
+	err := Start(cfg)
 	if err != nil {
-		log.Fatalf("failed to start server: %v", err)
+		common.Log.Sugar().Fatalf("failed to start server: %v", err)
 	}
 }

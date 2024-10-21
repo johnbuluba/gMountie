@@ -33,9 +33,7 @@ func main() {
 		log.Fatalf("Failed to create client: %v", err)
 	}
 
-	//fs := pathfs.NewLoopbackFileSystem("/home/john/mnt/test")
 	fs := io.NewGrpcInode(fsClient, fileClient)
-	//fs = pathfs.NewLockingFileSystem(fs)
 	fs.SetDebug(true)
 	nodeFS := pathfs.NewPathNodeFs(fs, &pathfs.PathNodeFsOptions{ClientInodes: true, Debug: true})
 	opts := nodefs.NewOptions()
