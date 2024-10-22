@@ -2,9 +2,12 @@ syntax = "proto3";
 package gmountie;
 option go_package = "pkg/proto";
 
+import "api/proto/common.proto";
+
 message OpenRequest {
-  string path = 1;
-  uint32 flags = 2;
+  Caller caller = 1;
+  string path = 2;
+  uint32 flags = 3;
 }
 
 message OpenReply {
@@ -12,9 +15,10 @@ message OpenReply {
 }
 
 message CreateRequest {
-  string path = 1;
-  uint32 flags = 2;
-  uint32 mode = 3;
+  Caller caller = 1;
+  string path = 2;
+  uint32 flags = 3;
+  uint32 mode = 4;
 }
 
 message CreateReply {

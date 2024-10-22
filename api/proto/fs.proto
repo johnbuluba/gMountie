@@ -2,11 +2,7 @@ syntax = "proto3";
 package gmountie;
 option go_package = "pkg/proto";
 
-message Owner {
-  uint32 uid = 1;
-  uint32 gid = 2;
-
-}
+import "api/proto/common.proto";
 
 message DirEntry {
   uint32 mode = 1;
@@ -54,7 +50,8 @@ message StatFsReply {
 
 
 message GetAttrRequest {
-  string path = 1;
+  Caller caller = 1;
+  string path = 2;
 }
 
 message GetAttrReply {
@@ -63,7 +60,8 @@ message GetAttrReply {
 }
 
 message OpenDirRequest {
-  string path = 1;
+  Caller caller = 1;
+  string path = 2;
 }
 
 message OpenDirReply {
@@ -72,7 +70,8 @@ message OpenDirReply {
 }
 
 message UnlinkRequest {
-  string path = 1;
+  Caller caller = 1;
+  string path = 2;
 }
 
 message UnlinkReply {
@@ -80,8 +79,9 @@ message UnlinkReply {
 }
 
 message AccessRequest {
-  string path = 1;
-  uint32 mode = 2;
+  Caller caller = 1;
+  string path = 2;
+  uint32 mode = 3;
 }
 
 message AccessReply {
@@ -89,8 +89,9 @@ message AccessReply {
 }
 
 message TruncateRequest {
-  string path = 1;
-  uint64 size = 2;
+  Caller caller = 1;
+  string path = 2;
+  uint64 size = 3;
 }
 
 message TruncateReply {
@@ -98,9 +99,10 @@ message TruncateReply {
 }
 
 message ChownRequest {
-  string path = 1;
-  uint32 uid = 2;
-  uint32 gid = 3;
+  Caller caller = 1;
+  string path = 2;
+  uint32 uid = 3;
+  uint32 gid = 4;
 }
 
 message ChownReply {
@@ -108,8 +110,9 @@ message ChownReply {
 }
 
 message ChmodRequest {
-  string path = 1;
-  uint32 mode = 2;
+  Caller caller = 1;
+  string path = 2;
+  uint32 mode = 3;
 }
 
 message ChmodReply {
@@ -117,8 +120,9 @@ message ChmodReply {
 }
 
 message MkdirRequest {
-  string path = 1;
-  uint32 mode = 2;
+  Caller caller = 1;
+  string path = 2;
+  uint32 mode = 3;
 }
 
 message MkdirReply {
@@ -126,7 +130,8 @@ message MkdirReply {
 }
 
 message RmdirRequest {
-  string path = 1;
+  Caller caller = 1;
+  string path = 2;
 }
 
 message RmdirReply {
@@ -134,8 +139,9 @@ message RmdirReply {
 }
 
 message RenameRequest {
-  string old_name = 1;
-  string new_name = 2;
+  Caller caller = 1;
+  string old_name = 2;
+  string new_name = 3;
 }
 
 message RenameReply {

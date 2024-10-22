@@ -4,9 +4,7 @@ import (
 	"context"
 	"gmountie/pkg/proto"
 	"gmountie/pkg/server/service"
-	"os"
 
-	"github.com/hanwen/go-fuse/v2/fuse"
 	"google.golang.org/grpc"
 )
 
@@ -35,7 +33,7 @@ func (r *RpcServerImpl) GetAttr(ctx context.Context, request *proto.GetAttrReque
 	if err != nil {
 		return nil, err
 	}
-	attr, status := fs.GetAttr(request.Path, createContext(ctx))
+	attr, status := fs.GetAttr(request.Path, createContext(ctx, request.Caller))
 	if attr == nil {
 		return &proto.GetAttrReply{
 			Status: int32(status),
@@ -70,7 +68,7 @@ func (r *RpcServerImpl) Mkdir(ctx context.Context, request *proto.MkdirRequest) 
 	if err != nil {
 		return nil, err
 	}
-	status := fs.Mkdir(request.Path, request.Mode, createContext(ctx))
+	status := fs.Mkdir(request.Path, request.Mode, createContext(ctx, request.Caller))
 	return &proto.MkdirReply{Status: int32(status)}, nil
 }
 
@@ -80,7 +78,7 @@ func (r *RpcServerImpl) Rmdir(ctx context.Context, request *proto.RmdirRequest) 
 	if err != nil {
 		return nil, err
 	}
-	status := fs.Rmdir(request.Path, createContext(ctx))
+	status := fs.Rmdir(request.Path, createContext(ctx, request.Caller))
 	return &proto.RmdirReply{Status: int32(status)}, nil
 }
 
@@ -90,7 +88,7 @@ func (r *RpcServerImpl) Rename(ctx context.Context, request *proto.RenameRequest
 	if err != nil {
 		return nil, err
 	}
-	status := fs.Rename(request.OldName, request.NewName, createContext(ctx))
+	status := fs.Rename(request.OldName, request.NewName, createContext(ctx, request.Caller))
 	return &proto.RenameReply{Status: int32(status)}, nil
 }
 
@@ -100,7 +98,7 @@ func (r *RpcServerImpl) OpenDir(ctx context.Context, request *proto.OpenDirReque
 	if err != nil {
 		return nil, err
 	}
-	dirs, s := fs.OpenDir(request.Path, createContext(ctx))
+	dirs, s := fs.OpenDir(request.Path, createContext(ctx, request.Caller))
 	// convert to proto.DirEntry
 	entries := make([]*proto.DirEntry, len(dirs))
 	for i, dir := range dirs {
@@ -143,7 +141,7 @@ func (r *RpcServerImpl) Unlink(ctx context.Context, request *proto.UnlinkRequest
 	if err != nil {
 		return nil, err
 	}
-	status := fs.Unlink(request.Path, createContext(ctx))
+	status := fs.Unlink(request.Path, createContext(ctx, request.Caller))
 	return &proto.UnlinkReply{Status: int32(status)}, nil
 }
 
@@ -153,7 +151,7 @@ func (r *RpcServerImpl) Access(ctx context.Context, request *proto.AccessRequest
 	if err != nil {
 		return nil, err
 	}
-	status := fs.Access(request.Path, request.Mode, createContext(ctx))
+	status := fs.Access(request.Path, request.Mode, createContext(ctx, request.Caller))
 	return &proto.AccessReply{Status: int32(status)}, nil
 }
 
@@ -163,7 +161,7 @@ func (r *RpcServerImpl) Truncate(ctx context.Context, request *proto.TruncateReq
 	if err != nil {
 		return nil, err
 	}
-	status := fs.Truncate(request.Path, request.Size, createContext(ctx))
+	status := fs.Truncate(request.Path, request.Size, createContext(ctx, request.Caller))
 	return &proto.TruncateReply{Status: int32(status)}, nil
 }
 
@@ -173,7 +171,7 @@ func (r *RpcServerImpl) Chmod(ctx context.Context, request *proto.ChmodRequest) 
 	if err != nil {
 		return nil, err
 	}
-	status := fs.Chmod(request.Path, request.Mode, createContext(ctx))
+	status := fs.Chmod(request.Path, request.Mode, createContext(ctx, request.Caller))
 	return &proto.ChmodReply{Status: int32(status)}, nil
 }
 
@@ -183,20 +181,6 @@ func (r *RpcServerImpl) Chown(ctx context.Context, request *proto.ChownRequest) 
 	if err != nil {
 		return nil, err
 	}
-	status := fs.Chown(request.Path, request.Uid, request.Gid, createContext(ctx))
+	status := fs.Chown(request.Path, request.Uid, request.Gid, createContext(ctx, request.Caller))
 	return &proto.ChownReply{Status: int32(status)}, nil
-}
-
-// createContext creates a new fuse.Context from the given context.Context
-func createContext(ctx context.Context) *fuse.Context {
-	return &fuse.Context{
-		Caller: fuse.Caller{
-			Owner: fuse.Owner{
-				Uid: uint32(os.Getuid()),
-				Gid: uint32(os.Getgid()),
-			},
-			Pid: uint32(os.Getpid()),
-		},
-		Cancel: ctx.Done(),
-	}
 }

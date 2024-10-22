@@ -1,0 +1,13 @@
+syntax = "proto3";
+package gmountie;
+option go_package = "pkg/proto";
+
+message Owner {
+  uint32 uid = 1;
+  uint32 gid = 2;
+}
+
+message Caller {
+  Owner owner = 1;
+  uint32 pid = 2;
+}

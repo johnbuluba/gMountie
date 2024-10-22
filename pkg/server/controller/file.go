@@ -43,7 +43,7 @@ func (r *RpcFileServerImpl) Open(ctx context.Context, request *proto.OpenRequest
 	if err != nil {
 		return nil, err
 	}
-	fd, status := fs.Open(request.Path, request.Flags, createContext(ctx))
+	fd, status := fs.Open(request.Path, request.Flags, createContext(ctx, request.Caller))
 	reply := &proto.OpenReply{
 		Status: int32(status),
 	}
@@ -56,7 +56,7 @@ func (r *RpcFileServerImpl) Create(ctx context.Context, request *proto.CreateReq
 	if err != nil {
 		return nil, err
 	}
-	fd, status := fs.Create(request.Path, request.Flags, request.Mode, createContext(ctx))
+	fd, status := fs.Create(request.Path, request.Flags, request.Mode, createContext(ctx, request.Caller))
 	reply := &proto.CreateReply{
 		Status: int32(status),
 	}
