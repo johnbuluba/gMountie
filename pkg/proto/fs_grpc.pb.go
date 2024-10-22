@@ -32,6 +32,7 @@ type RpcFsClient interface {
 	Chmod(ctx context.Context, in *ChmodRequest, opts ...grpc.CallOption) (*ChmodReply, error)
 	Mkdir(ctx context.Context, in *MkdirRequest, opts ...grpc.CallOption) (*MkdirReply, error)
 	Rmdir(ctx context.Context, in *RmdirRequest, opts ...grpc.CallOption) (*RmdirReply, error)
+	Rename(ctx context.Context, in *RenameRequest, opts ...grpc.CallOption) (*RenameReply, error)
 }
 
 type rpcFsClient struct {
@@ -132,6 +133,15 @@ func (c *rpcFsClient) Rmdir(ctx context.Context, in *RmdirRequest, opts ...grpc.
 	return out, nil
 }
 
+func (c *rpcFsClient) Rename(ctx context.Context, in *RenameRequest, opts ...grpc.CallOption) (*RenameReply, error) {
+	out := new(RenameReply)
+	err := c.cc.Invoke(ctx, "/grpc_fs.RpcFs/Rename", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RpcFsServer is the server API for RpcFs service.
 // All implementations must embed UnimplementedRpcFsServer
 // for forward compatibility
@@ -146,6 +156,7 @@ type RpcFsServer interface {
 	Chmod(context.Context, *ChmodRequest) (*ChmodReply, error)
 	Mkdir(context.Context, *MkdirRequest) (*MkdirReply, error)
 	Rmdir(context.Context, *RmdirRequest) (*RmdirReply, error)
+	Rename(context.Context, *RenameRequest) (*RenameReply, error)
 	mustEmbedUnimplementedRpcFsServer()
 }
 
@@ -182,6 +193,9 @@ func (UnimplementedRpcFsServer) Mkdir(context.Context, *MkdirRequest) (*MkdirRep
 }
 func (UnimplementedRpcFsServer) Rmdir(context.Context, *RmdirRequest) (*RmdirReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Rmdir not implemented")
+}
+func (UnimplementedRpcFsServer) Rename(context.Context, *RenameRequest) (*RenameReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Rename not implemented")
 }
 func (UnimplementedRpcFsServer) mustEmbedUnimplementedRpcFsServer() {}
 
@@ -376,6 +390,24 @@ func _RpcFs_Rmdir_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RpcFs_Rename_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RenameRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RpcFsServer).Rename(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/grpc_fs.RpcFs/Rename",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RpcFsServer).Rename(ctx, req.(*RenameRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // RpcFs_ServiceDesc is the grpc.ServiceDesc for RpcFs service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -422,6 +454,10 @@ var RpcFs_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Rmdir",
 			Handler:    _RpcFs_Rmdir_Handler,
+		},
+		{
+			MethodName: "Rename",
+			Handler:    _RpcFs_Rename_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -72,6 +72,12 @@ func (r *RpcServerImpl) Rmdir(ctx context.Context, request *proto.RmdirRequest) 
 	return &proto.RmdirReply{Status: int32(status)}, nil
 }
 
+// Rename renames a file
+func (r *RpcServerImpl) Rename(ctx context.Context, request *proto.RenameRequest) (*proto.RenameReply, error) {
+	status := r.filesystem.Rename(request.OldName, request.NewName, createContext(ctx))
+	return &proto.RenameReply{Status: int32(status)}, nil
+}
+
 // OpenDir opens a directory
 func (r *RpcServerImpl) OpenDir(ctx context.Context, request *proto.OpenDirRequest) (*proto.OpenDirReply, error) {
 	dirs, s := r.filesystem.OpenDir(request.Path, createContext(ctx))

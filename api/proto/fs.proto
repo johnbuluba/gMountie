@@ -133,6 +133,15 @@ message RmdirReply {
   int32 status = 1;
 }
 
+message RenameRequest {
+  string old_name = 1;
+  string new_name = 2;
+}
+
+message RenameReply {
+  int32 status = 1;
+}
+
 service RpcFs {
   rpc GetAttr (GetAttrRequest) returns (GetAttrReply);
   rpc StatFs (StatFsRequest) returns (StatFsReply);
@@ -144,5 +153,6 @@ service RpcFs {
   rpc Chmod (ChmodRequest) returns (ChmodReply);
   rpc Mkdir (MkdirRequest) returns (MkdirReply);
   rpc Rmdir (RmdirRequest) returns (RmdirReply);
+  rpc Rename (RenameRequest) returns (RenameReply);
 }
 

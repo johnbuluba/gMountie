@@ -81,6 +81,16 @@ func (fs *GrpcInode) Rmdir(name string, context *fuse.Context) (code fuse.Status
 	return fuse.Status(res.Status)
 }
 
+// Rename renames a file
+func (fs *GrpcInode) Rename(oldName string, newName string, context *fuse.Context) (code fuse.Status) {
+	res, err := fs.fsClient.Rename(context, &proto.RenameRequest{OldName: oldName, NewName: newName})
+	if err != nil || res == nil {
+		common.Log.Error("error in call: Rename", zap.String("oldName", oldName), zap.String("newName", newName), zap.Error(err))
+		return fuse.EIO
+	}
+	return fuse.Status(res.Status)
+}
+
 // OpenDir opens a directory
 func (fs *GrpcInode) OpenDir(name string, context *fuse.Context) (stream []fuse.DirEntry, code fuse.Status) {
 	res, err := fs.fsClient.OpenDir(context, &proto.OpenDirRequest{Path: name})
