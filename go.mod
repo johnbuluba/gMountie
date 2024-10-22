@@ -1,4 +1,4 @@
-module grpc-fs
+module gmountie
 
 go 1.23
 

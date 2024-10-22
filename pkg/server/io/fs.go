@@ -2,7 +2,7 @@ package io
 
 import (
 	"context"
-	"grpc-fs/pkg/proto"
+	"gmountie/pkg/proto"
 	"os"
 
 	"github.com/hanwen/go-fuse/v2/fuse"

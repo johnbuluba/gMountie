@@ -2,10 +2,10 @@ package main
 
 import (
 	"flag"
-	"grpc-fs/pkg/common"
-	"grpc-fs/pkg/server/config"
-	"grpc-fs/pkg/server/grpc"
-	"grpc-fs/pkg/server/io"
+	"gmountie/pkg/common"
+	"gmountie/pkg/server/config"
+	"gmountie/pkg/server/grpc"
+	"gmountie/pkg/server/io"
 	"os"
 
 	"github.com/hanwen/go-fuse/v2/fuse/pathfs"

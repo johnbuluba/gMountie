@@ -2,8 +2,8 @@ package io
 
 import (
 	"context"
-	"grpc-fs/pkg/common"
-	"grpc-fs/pkg/proto"
+	"gmountie/pkg/common"
+	"gmountie/pkg/proto"
 
 	"github.com/hanwen/go-fuse/v2/fuse"
 	"github.com/hanwen/go-fuse/v2/fuse/nodefs"

@@ -2,8 +2,8 @@ package grpc
 
 import (
 	"fmt"
-	"grpc-fs/pkg/common"
-	"grpc-fs/pkg/server/config"
+	"gmountie/pkg/common"
+	"gmountie/pkg/server/config"
 	"net"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"

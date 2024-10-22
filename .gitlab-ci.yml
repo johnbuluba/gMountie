@@ -1,7 +1,5 @@
 image: golang:1.23
 
-
-
 stages:
   - test
   - build

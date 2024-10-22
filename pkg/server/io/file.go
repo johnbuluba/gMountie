@@ -3,7 +3,7 @@ package io
 import (
 	"context"
 	"errors"
-	"grpc-fs/pkg/proto"
+	"gmountie/pkg/proto"
 
 	"github.com/hanwen/go-fuse/v2/fuse"
 	"github.com/hanwen/go-fuse/v2/fuse/nodefs"

@@ -9,8 +9,8 @@ package main
 
 import (
 	"flag"
-	"grpc-fs/pkg/client/grpc"
-	"grpc-fs/pkg/client/io"
+	"gmountie/pkg/client/grpc"
+	"gmountie/pkg/client/io"
 	"log"
 	"os"
 	"os/signal"
