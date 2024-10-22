@@ -1,0 +1,11 @@
+
+service:
+  type: LoadBalancer
+  port: 9449
+  externalTrafficPolicy: Local
+
+persistence:
+  enabled: true
+  accessMode: ReadWriteOnce
+  size: 10Gi
+  storageClass: "rook-ceph-block"
