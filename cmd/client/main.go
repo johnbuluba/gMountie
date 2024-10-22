@@ -28,12 +28,12 @@ func main() {
 		log.Fatal("Usage:\n  hello MOUNTPOINT")
 	}
 
-	fsClient, fileClient, err := grpc.NewClient()
+	client, err := grpc.NewClient("test")
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
 	}
 
-	fs := io.NewGrpcInode(fsClient, fileClient)
+	fs := io.NewGrpcInode(client)
 	fs.SetDebug(true)
 	nodeFS := pathfs.NewPathNodeFs(fs, &pathfs.PathNodeFsOptions{ClientInodes: true, Debug: true})
 	opts := nodefs.NewOptions()

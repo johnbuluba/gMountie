@@ -1,0 +1,18 @@
+syntax = "proto3";
+package gmountie;
+option go_package = "pkg/proto";
+
+message Volume {
+  string name = 1;
+}
+
+message VolumeListRequest {
+}
+
+message VolumeListReply {
+  repeated Volume volumes = 1;
+}
+
+service VolumeService {
+  rpc List (VolumeListRequest) returns (VolumeListReply);
+}

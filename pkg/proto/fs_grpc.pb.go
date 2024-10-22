@@ -45,7 +45,7 @@ func NewRpcFsClient(cc grpc.ClientConnInterface) RpcFsClient {
 
 func (c *rpcFsClient) GetAttr(ctx context.Context, in *GetAttrRequest, opts ...grpc.CallOption) (*GetAttrReply, error) {
 	out := new(GetAttrReply)
-	err := c.cc.Invoke(ctx, "/grpc_fs.RpcFs/GetAttr", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gmountie.RpcFs/GetAttr", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func (c *rpcFsClient) GetAttr(ctx context.Context, in *GetAttrRequest, opts ...g
 
 func (c *rpcFsClient) StatFs(ctx context.Context, in *StatFsRequest, opts ...grpc.CallOption) (*StatFsReply, error) {
 	out := new(StatFsReply)
-	err := c.cc.Invoke(ctx, "/grpc_fs.RpcFs/StatFs", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gmountie.RpcFs/StatFs", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (c *rpcFsClient) StatFs(ctx context.Context, in *StatFsRequest, opts ...grp
 
 func (c *rpcFsClient) OpenDir(ctx context.Context, in *OpenDirRequest, opts ...grpc.CallOption) (*OpenDirReply, error) {
 	out := new(OpenDirReply)
-	err := c.cc.Invoke(ctx, "/grpc_fs.RpcFs/OpenDir", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gmountie.RpcFs/OpenDir", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func (c *rpcFsClient) OpenDir(ctx context.Context, in *OpenDirRequest, opts ...g
 
 func (c *rpcFsClient) Unlink(ctx context.Context, in *UnlinkRequest, opts ...grpc.CallOption) (*UnlinkReply, error) {
 	out := new(UnlinkReply)
-	err := c.cc.Invoke(ctx, "/grpc_fs.RpcFs/Unlink", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gmountie.RpcFs/Unlink", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +81,7 @@ func (c *rpcFsClient) Unlink(ctx context.Context, in *UnlinkRequest, opts ...grp
 
 func (c *rpcFsClient) Access(ctx context.Context, in *AccessRequest, opts ...grpc.CallOption) (*AccessReply, error) {
 	out := new(AccessReply)
-	err := c.cc.Invoke(ctx, "/grpc_fs.RpcFs/Access", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gmountie.RpcFs/Access", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ func (c *rpcFsClient) Access(ctx context.Context, in *AccessRequest, opts ...grp
 
 func (c *rpcFsClient) Truncate(ctx context.Context, in *TruncateRequest, opts ...grpc.CallOption) (*TruncateReply, error) {
 	out := new(TruncateReply)
-	err := c.cc.Invoke(ctx, "/grpc_fs.RpcFs/Truncate", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gmountie.RpcFs/Truncate", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +99,7 @@ func (c *rpcFsClient) Truncate(ctx context.Context, in *TruncateRequest, opts ..
 
 func (c *rpcFsClient) Chown(ctx context.Context, in *ChownRequest, opts ...grpc.CallOption) (*ChownReply, error) {
 	out := new(ChownReply)
-	err := c.cc.Invoke(ctx, "/grpc_fs.RpcFs/Chown", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gmountie.RpcFs/Chown", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +108,7 @@ func (c *rpcFsClient) Chown(ctx context.Context, in *ChownRequest, opts ...grpc.
 
 func (c *rpcFsClient) Chmod(ctx context.Context, in *ChmodRequest, opts ...grpc.CallOption) (*ChmodReply, error) {
 	out := new(ChmodReply)
-	err := c.cc.Invoke(ctx, "/grpc_fs.RpcFs/Chmod", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gmountie.RpcFs/Chmod", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +117,7 @@ func (c *rpcFsClient) Chmod(ctx context.Context, in *ChmodRequest, opts ...grpc.
 
 func (c *rpcFsClient) Mkdir(ctx context.Context, in *MkdirRequest, opts ...grpc.CallOption) (*MkdirReply, error) {
 	out := new(MkdirReply)
-	err := c.cc.Invoke(ctx, "/grpc_fs.RpcFs/Mkdir", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gmountie.RpcFs/Mkdir", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +126,7 @@ func (c *rpcFsClient) Mkdir(ctx context.Context, in *MkdirRequest, opts ...grpc.
 
 func (c *rpcFsClient) Rmdir(ctx context.Context, in *RmdirRequest, opts ...grpc.CallOption) (*RmdirReply, error) {
 	out := new(RmdirReply)
-	err := c.cc.Invoke(ctx, "/grpc_fs.RpcFs/Rmdir", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gmountie.RpcFs/Rmdir", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +135,7 @@ func (c *rpcFsClient) Rmdir(ctx context.Context, in *RmdirRequest, opts ...grpc.
 
 func (c *rpcFsClient) Rename(ctx context.Context, in *RenameRequest, opts ...grpc.CallOption) (*RenameReply, error) {
 	out := new(RenameReply)
-	err := c.cc.Invoke(ctx, "/grpc_fs.RpcFs/Rename", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gmountie.RpcFs/Rename", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -220,7 +220,7 @@ func _RpcFs_GetAttr_Handler(srv interface{}, ctx context.Context, dec func(inter
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/grpc_fs.RpcFs/GetAttr",
+		FullMethod: "/gmountie.RpcFs/GetAttr",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(RpcFsServer).GetAttr(ctx, req.(*GetAttrRequest))
@@ -238,7 +238,7 @@ func _RpcFs_StatFs_Handler(srv interface{}, ctx context.Context, dec func(interf
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/grpc_fs.RpcFs/StatFs",
+		FullMethod: "/gmountie.RpcFs/StatFs",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(RpcFsServer).StatFs(ctx, req.(*StatFsRequest))
@@ -256,7 +256,7 @@ func _RpcFs_OpenDir_Handler(srv interface{}, ctx context.Context, dec func(inter
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/grpc_fs.RpcFs/OpenDir",
+		FullMethod: "/gmountie.RpcFs/OpenDir",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(RpcFsServer).OpenDir(ctx, req.(*OpenDirRequest))
@@ -274,7 +274,7 @@ func _RpcFs_Unlink_Handler(srv interface{}, ctx context.Context, dec func(interf
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/grpc_fs.RpcFs/Unlink",
+		FullMethod: "/gmountie.RpcFs/Unlink",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(RpcFsServer).Unlink(ctx, req.(*UnlinkRequest))
@@ -292,7 +292,7 @@ func _RpcFs_Access_Handler(srv interface{}, ctx context.Context, dec func(interf
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/grpc_fs.RpcFs/Access",
+		FullMethod: "/gmountie.RpcFs/Access",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(RpcFsServer).Access(ctx, req.(*AccessRequest))
@@ -310,7 +310,7 @@ func _RpcFs_Truncate_Handler(srv interface{}, ctx context.Context, dec func(inte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/grpc_fs.RpcFs/Truncate",
+		FullMethod: "/gmountie.RpcFs/Truncate",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(RpcFsServer).Truncate(ctx, req.(*TruncateRequest))
@@ -328,7 +328,7 @@ func _RpcFs_Chown_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/grpc_fs.RpcFs/Chown",
+		FullMethod: "/gmountie.RpcFs/Chown",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(RpcFsServer).Chown(ctx, req.(*ChownRequest))
@@ -346,7 +346,7 @@ func _RpcFs_Chmod_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/grpc_fs.RpcFs/Chmod",
+		FullMethod: "/gmountie.RpcFs/Chmod",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(RpcFsServer).Chmod(ctx, req.(*ChmodRequest))
@@ -364,7 +364,7 @@ func _RpcFs_Mkdir_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/grpc_fs.RpcFs/Mkdir",
+		FullMethod: "/gmountie.RpcFs/Mkdir",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(RpcFsServer).Mkdir(ctx, req.(*MkdirRequest))
@@ -382,7 +382,7 @@ func _RpcFs_Rmdir_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/grpc_fs.RpcFs/Rmdir",
+		FullMethod: "/gmountie.RpcFs/Rmdir",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(RpcFsServer).Rmdir(ctx, req.(*RmdirRequest))
@@ -400,7 +400,7 @@ func _RpcFs_Rename_Handler(srv interface{}, ctx context.Context, dec func(interf
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/grpc_fs.RpcFs/Rename",
+		FullMethod: "/gmountie.RpcFs/Rename",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(RpcFsServer).Rename(ctx, req.(*RenameRequest))
@@ -412,7 +412,7 @@ func _RpcFs_Rename_Handler(srv interface{}, ctx context.Context, dec func(interf
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var RpcFs_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "grpc_fs.RpcFs",
+	ServiceName: "gmountie.RpcFs",
 	HandlerType: (*RpcFsServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

@@ -38,7 +38,7 @@ func NewRpcFileClient(cc grpc.ClientConnInterface) RpcFileClient {
 
 func (c *rpcFileClient) Open(ctx context.Context, in *OpenRequest, opts ...grpc.CallOption) (*OpenReply, error) {
 	out := new(OpenReply)
-	err := c.cc.Invoke(ctx, "/grpc_fs.RpcFile/Open", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gmountie.RpcFile/Open", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (c *rpcFileClient) Open(ctx context.Context, in *OpenRequest, opts ...grpc.
 
 func (c *rpcFileClient) Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateReply, error) {
 	out := new(CreateReply)
-	err := c.cc.Invoke(ctx, "/grpc_fs.RpcFile/Create", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gmountie.RpcFile/Create", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (c *rpcFileClient) Create(ctx context.Context, in *CreateRequest, opts ...g
 
 func (c *rpcFileClient) Read(ctx context.Context, in *ReadRequest, opts ...grpc.CallOption) (*ReadReply, error) {
 	out := new(ReadReply)
-	err := c.cc.Invoke(ctx, "/grpc_fs.RpcFile/Read", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gmountie.RpcFile/Read", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func (c *rpcFileClient) Read(ctx context.Context, in *ReadRequest, opts ...grpc.
 
 func (c *rpcFileClient) Write(ctx context.Context, in *WriteRequest, opts ...grpc.CallOption) (*WriteReply, error) {
 	out := new(WriteReply)
-	err := c.cc.Invoke(ctx, "/grpc_fs.RpcFile/Write", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gmountie.RpcFile/Write", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +122,7 @@ func _RpcFile_Open_Handler(srv interface{}, ctx context.Context, dec func(interf
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/grpc_fs.RpcFile/Open",
+		FullMethod: "/gmountie.RpcFile/Open",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(RpcFileServer).Open(ctx, req.(*OpenRequest))
@@ -140,7 +140,7 @@ func _RpcFile_Create_Handler(srv interface{}, ctx context.Context, dec func(inte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/grpc_fs.RpcFile/Create",
+		FullMethod: "/gmountie.RpcFile/Create",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(RpcFileServer).Create(ctx, req.(*CreateRequest))
@@ -158,7 +158,7 @@ func _RpcFile_Read_Handler(srv interface{}, ctx context.Context, dec func(interf
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/grpc_fs.RpcFile/Read",
+		FullMethod: "/gmountie.RpcFile/Read",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(RpcFileServer).Read(ctx, req.(*ReadRequest))
@@ -176,7 +176,7 @@ func _RpcFile_Write_Handler(srv interface{}, ctx context.Context, dec func(inter
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/grpc_fs.RpcFile/Write",
+		FullMethod: "/gmountie.RpcFile/Write",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(RpcFileServer).Write(ctx, req.(*WriteRequest))
@@ -188,7 +188,7 @@ func _RpcFile_Write_Handler(srv interface{}, ctx context.Context, dec func(inter
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var RpcFile_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "grpc_fs.RpcFile",
+	ServiceName: "gmountie.RpcFile",
 	HandlerType: (*RpcFileServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

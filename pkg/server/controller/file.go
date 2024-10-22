@@ -1,13 +1,13 @@
-package io
+package controller
 
 import (
 	"context"
 	"errors"
 	"gmountie/pkg/proto"
+	"gmountie/pkg/server/service"
 
 	"github.com/hanwen/go-fuse/v2/fuse"
 	"github.com/hanwen/go-fuse/v2/fuse/nodefs"
-	"github.com/hanwen/go-fuse/v2/fuse/pathfs"
 	"google.golang.org/grpc"
 )
 
@@ -17,8 +17,8 @@ type fileEntry struct {
 }
 
 type RpcFileServerImpl struct {
-	filesystem pathfs.FileSystem
-	files      map[string]*fileEntry
+	fsService service.VolumeService
+	files     map[string]*fileEntry
 	proto.UnimplementedRpcFileServer
 }
 
@@ -26,10 +26,10 @@ type RpcFileServerImpl struct {
 var _ proto.RpcFileServer = (*RpcFileServerImpl)(nil)
 
 // NewRpcFileServer creates a new RpcFileServerImpl
-func NewRpcFileServer(filesystem pathfs.FileSystem) *RpcFileServerImpl {
+func NewRpcFileServer(fsService service.VolumeService) *RpcFileServerImpl {
 	return &RpcFileServerImpl{
-		filesystem: filesystem,
-		files:      make(map[string]*fileEntry),
+		fsService: fsService,
+		files:     make(map[string]*fileEntry),
 	}
 }
 
@@ -39,7 +39,11 @@ func (r *RpcFileServerImpl) Register(server *grpc.Server) {
 }
 
 func (r *RpcFileServerImpl) Open(ctx context.Context, request *proto.OpenRequest) (*proto.OpenReply, error) {
-	fd, status := r.filesystem.Open(request.Path, request.Flags, createContext(ctx))
+	fs, err := r.fsService.GetVolumeFileSystemFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	fd, status := fs.Open(request.Path, request.Flags, createContext(ctx))
 	reply := &proto.OpenReply{
 		Status: int32(status),
 	}
@@ -48,7 +52,11 @@ func (r *RpcFileServerImpl) Open(ctx context.Context, request *proto.OpenRequest
 }
 
 func (r *RpcFileServerImpl) Create(ctx context.Context, request *proto.CreateRequest) (*proto.CreateReply, error) {
-	fd, status := r.filesystem.Create(request.Path, request.Flags, request.Mode, createContext(ctx))
+	fs, err := r.fsService.GetVolumeFileSystemFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	fd, status := fs.Create(request.Path, request.Flags, request.Mode, createContext(ctx))
 	reply := &proto.CreateReply{
 		Status: int32(status),
 	}

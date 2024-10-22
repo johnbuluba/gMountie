@@ -4,11 +4,11 @@ import (
 	"flag"
 	"gmountie/pkg/common"
 	"gmountie/pkg/server/config"
+	"gmountie/pkg/server/controller"
 	"gmountie/pkg/server/grpc"
-	"gmountie/pkg/server/io"
+	"gmountie/pkg/server/service"
 	"os"
 
-	"github.com/hanwen/go-fuse/v2/fuse/pathfs"
 	"github.com/pkg/errors"
 )
 
@@ -27,9 +27,12 @@ func Start(cfgString string) error {
 		return err
 	}
 
-	fs := pathfs.NewLoopbackFileSystem(cfg.Volumes[0].Path)
-	//fs = pathfs.NewLockingFileSystem(fs)
-	server := grpc.NewServer(&cfg, []grpc.ServiceRegistrar{io.NewGrpcServer(fs), io.NewRpcFileServer(fs)})
+	volumeService := service.NewVolumeService(&cfg)
+	server := grpc.NewServer(&cfg, []grpc.ServiceRegistrar{
+		controller.NewGrpcServer(volumeService),
+		controller.NewRpcFileServer(volumeService),
+		controller.NewVolumeService(volumeService),
+	})
 
 	if err = server.Serve(); err != nil {
 		return errors.Wrap(err, "failed to start server")

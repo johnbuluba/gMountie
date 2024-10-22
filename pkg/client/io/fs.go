@@ -2,6 +2,7 @@ package io
 
 import (
 	"context"
+	"gmountie/pkg/client/grpc"
 	"gmountie/pkg/common"
 	"gmountie/pkg/proto"
 
@@ -12,16 +13,14 @@ import (
 )
 
 type GrpcInode struct {
-	fsClient   proto.RpcFsClient
-	fileClient proto.RpcFileClient
+	client *grpc.Client
 	pathfs.FileSystem
 }
 
 // NewGrpcInode creates a new GrpcInode
-func NewGrpcInode(fsClient proto.RpcFsClient, fileClient proto.RpcFileClient) pathfs.FileSystem {
+func NewGrpcInode(client *grpc.Client) pathfs.FileSystem {
 	return &GrpcInode{
-		fsClient:   fsClient,
-		fileClient: fileClient,
+		client:     client,
 		FileSystem: pathfs.NewDefaultFileSystem(),
 	}
 }
@@ -33,7 +32,7 @@ func (fs *GrpcInode) OnMount(nodeFs *pathfs.PathNodeFs) {
 
 // GetAttr returns the attributes of a file
 func (fs *GrpcInode) GetAttr(name string, context *fuse.Context) (*fuse.Attr, fuse.Status) {
-	res, err := fs.fsClient.GetAttr(context, &proto.GetAttrRequest{Path: name})
+	res, err := fs.client.Fs.GetAttr(context, &proto.GetAttrRequest{Path: name})
 	if err != nil {
 		common.Log.Error("error in call: GetAttr", zap.String("path", name), zap.Error(err))
 		return &fuse.Attr{}, fuse.EIO
@@ -63,7 +62,7 @@ func (fs *GrpcInode) GetAttr(name string, context *fuse.Context) (*fuse.Attr, fu
 
 // Mkdir creates a directory
 func (fs *GrpcInode) Mkdir(name string, mode uint32, context *fuse.Context) fuse.Status {
-	res, err := fs.fsClient.Mkdir(context, &proto.MkdirRequest{Path: name, Mode: mode})
+	res, err := fs.client.Fs.Mkdir(context, &proto.MkdirRequest{Path: name, Mode: mode})
 	if err != nil || res == nil {
 		common.Log.Error("error in call: MkDir", zap.String("path", name), zap.Error(err))
 		return fuse.EIO
@@ -73,7 +72,7 @@ func (fs *GrpcInode) Mkdir(name string, mode uint32, context *fuse.Context) fuse
 
 // Rmdir removes a directory
 func (fs *GrpcInode) Rmdir(name string, context *fuse.Context) (code fuse.Status) {
-	res, err := fs.fsClient.Rmdir(context, &proto.RmdirRequest{Path: name})
+	res, err := fs.client.Fs.Rmdir(context, &proto.RmdirRequest{Path: name})
 	if err != nil || res == nil {
 		common.Log.Error("error in call: RmDir", zap.String("path", name), zap.Error(err))
 		return fuse.EIO
@@ -83,7 +82,7 @@ func (fs *GrpcInode) Rmdir(name string, context *fuse.Context) (code fuse.Status
 
 // Rename renames a file
 func (fs *GrpcInode) Rename(oldName string, newName string, context *fuse.Context) (code fuse.Status) {
-	res, err := fs.fsClient.Rename(context, &proto.RenameRequest{OldName: oldName, NewName: newName})
+	res, err := fs.client.Fs.Rename(context, &proto.RenameRequest{OldName: oldName, NewName: newName})
 	if err != nil || res == nil {
 		common.Log.Error("error in call: Rename", zap.String("oldName", oldName), zap.String("newName", newName), zap.Error(err))
 		return fuse.EIO
@@ -93,7 +92,7 @@ func (fs *GrpcInode) Rename(oldName string, newName string, context *fuse.Contex
 
 // OpenDir opens a directory
 func (fs *GrpcInode) OpenDir(name string, context *fuse.Context) (stream []fuse.DirEntry, code fuse.Status) {
-	res, err := fs.fsClient.OpenDir(context, &proto.OpenDirRequest{Path: name})
+	res, err := fs.client.Fs.OpenDir(context, &proto.OpenDirRequest{Path: name})
 	if err != nil || res == nil {
 		common.Log.Error("error in call: OpenDir", zap.String("path", name), zap.Error(err))
 		return nil, fuse.EIO
@@ -111,7 +110,7 @@ func (fs *GrpcInode) OpenDir(name string, context *fuse.Context) (stream []fuse.
 }
 
 func (fs *GrpcInode) Open(name string, flags uint32, context *fuse.Context) (file nodefs.File, code fuse.Status) {
-	res, err := fs.fileClient.Open(context, &proto.OpenRequest{Path: name, Flags: flags})
+	res, err := fs.client.File.Open(context, &proto.OpenRequest{Path: name, Flags: flags})
 	if err != nil || res == nil {
 		common.Log.Error("error in call: Open", zap.String("path", name), zap.Error(err))
 		return nil, fuse.EIO
@@ -119,11 +118,11 @@ func (fs *GrpcInode) Open(name string, flags uint32, context *fuse.Context) (fil
 	if fuse.Status(res.Status) != fuse.OK {
 		return nil, fuse.Status(res.Status)
 	}
-	return NewGrpcFile(fs.fileClient, name), fuse.Status(res.Status)
+	return NewGrpcFile(fs.client.File, name), fuse.Status(res.Status)
 }
 
 func (fs *GrpcInode) Create(name string, flags uint32, mode uint32, context *fuse.Context) (file nodefs.File, code fuse.Status) {
-	res, err := fs.fileClient.Create(context, &proto.CreateRequest{Path: name, Flags: flags, Mode: mode})
+	res, err := fs.client.File.Create(context, &proto.CreateRequest{Path: name, Flags: flags, Mode: mode})
 	if err != nil || res == nil {
 		common.Log.Error("error in call: Create", zap.String("path", name), zap.Error(err))
 		return nil, fuse.EIO
@@ -131,11 +130,11 @@ func (fs *GrpcInode) Create(name string, flags uint32, mode uint32, context *fus
 	if fuse.Status(res.Status) != fuse.OK {
 		return nil, fuse.Status(res.Status)
 	}
-	return NewGrpcFile(fs.fileClient, name), fuse.Status(res.Status)
+	return NewGrpcFile(fs.client.File, name), fuse.Status(res.Status)
 }
 
 func (fs *GrpcInode) Unlink(name string, context *fuse.Context) (code fuse.Status) {
-	res, err := fs.fsClient.Unlink(context, &proto.UnlinkRequest{Path: name})
+	res, err := fs.client.Fs.Unlink(context, &proto.UnlinkRequest{Path: name})
 	if err != nil || res == nil {
 		common.Log.Error("error in call: Unlink", zap.String("path", name), zap.Error(err))
 		return fuse.EIO
@@ -144,7 +143,7 @@ func (fs *GrpcInode) Unlink(name string, context *fuse.Context) (code fuse.Statu
 }
 
 func (fs *GrpcInode) Access(name string, mode uint32, context *fuse.Context) (code fuse.Status) {
-	res, err := fs.fsClient.Access(context, &proto.AccessRequest{Path: name, Mode: mode})
+	res, err := fs.client.Fs.Access(context, &proto.AccessRequest{Path: name, Mode: mode})
 	if err != nil || res == nil {
 		common.Log.Error("error in call: Access", zap.String("path", name), zap.Error(err))
 		return fuse.EIO
@@ -154,7 +153,7 @@ func (fs *GrpcInode) Access(name string, mode uint32, context *fuse.Context) (co
 
 // Truncate truncates a file
 func (fs *GrpcInode) Truncate(name string, size uint64, context *fuse.Context) (code fuse.Status) {
-	res, err := fs.fsClient.Truncate(context, &proto.TruncateRequest{Path: name, Size: size})
+	res, err := fs.client.Fs.Truncate(context, &proto.TruncateRequest{Path: name, Size: size})
 	if err != nil || res == nil {
 		common.Log.Error("error in call: Truncate", zap.String("path", name), zap.Error(err))
 		return fuse.EIO
@@ -164,7 +163,7 @@ func (fs *GrpcInode) Truncate(name string, size uint64, context *fuse.Context) (
 
 // Chmod changes the mode of a file
 func (fs *GrpcInode) Chmod(name string, mode uint32, context *fuse.Context) (code fuse.Status) {
-	res, err := fs.fsClient.Chmod(context, &proto.ChmodRequest{Path: name, Mode: mode})
+	res, err := fs.client.Fs.Chmod(context, &proto.ChmodRequest{Path: name, Mode: mode})
 	if err != nil || res == nil {
 		common.Log.Error("error in call: Chmod", zap.String("path", name), zap.Error(err))
 		return fuse.EIO
@@ -174,7 +173,7 @@ func (fs *GrpcInode) Chmod(name string, mode uint32, context *fuse.Context) (cod
 
 // Chown changes the owner of a file
 func (fs *GrpcInode) Chown(name string, uid uint32, gid uint32, context *fuse.Context) (code fuse.Status) {
-	res, err := fs.fsClient.Chown(context, &proto.ChownRequest{Path: name, Uid: uid, Gid: gid})
+	res, err := fs.client.Fs.Chown(context, &proto.ChownRequest{Path: name, Uid: uid, Gid: gid})
 	if err != nil || res == nil {
 		common.Log.Error("error in call: Chown", zap.String("path", name), zap.Error(err))
 		return fuse.EIO
@@ -183,7 +182,7 @@ func (fs *GrpcInode) Chown(name string, uid uint32, gid uint32, context *fuse.Co
 }
 
 func (fs *GrpcInode) StatFs(name string) *fuse.StatfsOut {
-	res, err := fs.fsClient.StatFs(context.Background(), &proto.StatFsRequest{Path: name})
+	res, err := fs.client.Fs.StatFs(context.Background(), &proto.StatFsRequest{Path: name})
 	if err != nil || res == nil {
 		common.Log.Error("error in call: StatFs", zap.String("path", name), zap.Error(err))
 		return nil
