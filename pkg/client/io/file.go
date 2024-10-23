@@ -4,10 +4,12 @@ import (
 	"context"
 	"gmountie/pkg/common"
 	"gmountie/pkg/proto"
+	"gmountie/pkg/server/grpc/snappy"
 
 	"github.com/hanwen/go-fuse/v2/fuse"
 	"github.com/hanwen/go-fuse/v2/fuse/nodefs"
 	"go.uber.org/zap"
+	"google.golang.org/grpc"
 )
 
 type GrpcFile struct {
@@ -29,7 +31,9 @@ func (f *GrpcFile) Read(dest []byte, off int64) (fuse.ReadResult, fuse.Status) {
 		Path:   f.path,
 		Offset: off,
 		Size:   uint32(len(dest)),
-	})
+	},
+		grpc.UseCompressor(snappy.Name),
+	)
 	if err != nil || res == nil {
 		common.Log.Error("error in call: Read", zap.String("path", f.path), zap.Error(err))
 		return nil, fuse.EIO
@@ -41,7 +45,9 @@ func (f *GrpcFile) Write(data []byte, off int64) (written uint32, code fuse.Stat
 		Path:   f.path,
 		Offset: off,
 		Bytes:  data,
-	})
+	},
+		grpc.UseCompressor(snappy.Name),
+	)
 	if err != nil || res == nil {
 		common.Log.Error("error in call: Write", zap.String("path", f.path), zap.Error(err))
 		return 0, fuse.EIO

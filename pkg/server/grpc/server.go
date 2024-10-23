@@ -6,10 +6,13 @@ import (
 	"gmountie/pkg/server/config"
 	"net"
 
+	_ "gmountie/pkg/server/grpc/snappy" // Installing the snappy encoding as an available compressor.
+
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	_ "google.golang.org/grpc/encoding/gzip" // Installing the gzip encoding as an available compressor.
 	"google.golang.org/grpc/reflection"
 )
 

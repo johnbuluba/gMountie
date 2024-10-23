@@ -5,6 +5,7 @@ go 1.23
 require (
 	github.com/avast/retry-go/v4 v4.6.0
 	github.com/go-playground/validator/v10 v10.22.1
+	github.com/golang/snappy v0.0.4
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.1.0
 	github.com/hanwen/go-fuse/v2 v2.6.2
 	github.com/pkg/errors v0.9.1
