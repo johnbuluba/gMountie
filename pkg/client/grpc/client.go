@@ -15,15 +15,15 @@ type Client struct {
 	File   proto.RpcFileClient
 }
 
-func NewClient(volume string) (*Client, error) {
+func NewClient(endpoint string, volume string) (*Client, error) {
 	conn, err := grpc.NewClient(
-		"localhost:9449",
+		endpoint,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		//grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{})),
 		grpc.WithChainUnaryInterceptor(
 			getInterceptors(volume)...,
 		),
 	)
-	//conn, err := grpc.NewClient("192.168.11.42:9449", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
 	}

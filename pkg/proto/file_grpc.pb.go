@@ -26,6 +26,12 @@ type RpcFileClient interface {
 	Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateReply, error)
 	Read(ctx context.Context, in *ReadRequest, opts ...grpc.CallOption) (*ReadReply, error)
 	Write(ctx context.Context, in *WriteRequest, opts ...grpc.CallOption) (*WriteReply, error)
+	Release(ctx context.Context, in *ReleaseRequest, opts ...grpc.CallOption) (*ReleaseReply, error)
+	Fsync(ctx context.Context, in *FsyncRequest, opts ...grpc.CallOption) (*FsyncReply, error)
+	Flush(ctx context.Context, in *FlushRequest, opts ...grpc.CallOption) (*FlushReply, error)
+	GetLk(ctx context.Context, in *GetLkRequest, opts ...grpc.CallOption) (*GetLkReply, error)
+	SetLk(ctx context.Context, in *SetLkRequest, opts ...grpc.CallOption) (*SetLkReply, error)
+	SetLkw(ctx context.Context, in *SetLkwRequest, opts ...grpc.CallOption) (*SetLkwReply, error)
 }
 
 type rpcFileClient struct {
@@ -72,6 +78,60 @@ func (c *rpcFileClient) Write(ctx context.Context, in *WriteRequest, opts ...grp
 	return out, nil
 }
 
+func (c *rpcFileClient) Release(ctx context.Context, in *ReleaseRequest, opts ...grpc.CallOption) (*ReleaseReply, error) {
+	out := new(ReleaseReply)
+	err := c.cc.Invoke(ctx, "/gmountie.RpcFile/Release", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *rpcFileClient) Fsync(ctx context.Context, in *FsyncRequest, opts ...grpc.CallOption) (*FsyncReply, error) {
+	out := new(FsyncReply)
+	err := c.cc.Invoke(ctx, "/gmountie.RpcFile/Fsync", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *rpcFileClient) Flush(ctx context.Context, in *FlushRequest, opts ...grpc.CallOption) (*FlushReply, error) {
+	out := new(FlushReply)
+	err := c.cc.Invoke(ctx, "/gmountie.RpcFile/Flush", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *rpcFileClient) GetLk(ctx context.Context, in *GetLkRequest, opts ...grpc.CallOption) (*GetLkReply, error) {
+	out := new(GetLkReply)
+	err := c.cc.Invoke(ctx, "/gmountie.RpcFile/GetLk", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *rpcFileClient) SetLk(ctx context.Context, in *SetLkRequest, opts ...grpc.CallOption) (*SetLkReply, error) {
+	out := new(SetLkReply)
+	err := c.cc.Invoke(ctx, "/gmountie.RpcFile/SetLk", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *rpcFileClient) SetLkw(ctx context.Context, in *SetLkwRequest, opts ...grpc.CallOption) (*SetLkwReply, error) {
+	out := new(SetLkwReply)
+	err := c.cc.Invoke(ctx, "/gmountie.RpcFile/SetLkw", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RpcFileServer is the server API for RpcFile service.
 // All implementations must embed UnimplementedRpcFileServer
 // for forward compatibility
@@ -80,6 +140,12 @@ type RpcFileServer interface {
 	Create(context.Context, *CreateRequest) (*CreateReply, error)
 	Read(context.Context, *ReadRequest) (*ReadReply, error)
 	Write(context.Context, *WriteRequest) (*WriteReply, error)
+	Release(context.Context, *ReleaseRequest) (*ReleaseReply, error)
+	Fsync(context.Context, *FsyncRequest) (*FsyncReply, error)
+	Flush(context.Context, *FlushRequest) (*FlushReply, error)
+	GetLk(context.Context, *GetLkRequest) (*GetLkReply, error)
+	SetLk(context.Context, *SetLkRequest) (*SetLkReply, error)
+	SetLkw(context.Context, *SetLkwRequest) (*SetLkwReply, error)
 	mustEmbedUnimplementedRpcFileServer()
 }
 
@@ -98,6 +164,24 @@ func (UnimplementedRpcFileServer) Read(context.Context, *ReadRequest) (*ReadRepl
 }
 func (UnimplementedRpcFileServer) Write(context.Context, *WriteRequest) (*WriteReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Write not implemented")
+}
+func (UnimplementedRpcFileServer) Release(context.Context, *ReleaseRequest) (*ReleaseReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Release not implemented")
+}
+func (UnimplementedRpcFileServer) Fsync(context.Context, *FsyncRequest) (*FsyncReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Fsync not implemented")
+}
+func (UnimplementedRpcFileServer) Flush(context.Context, *FlushRequest) (*FlushReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Flush not implemented")
+}
+func (UnimplementedRpcFileServer) GetLk(context.Context, *GetLkRequest) (*GetLkReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetLk not implemented")
+}
+func (UnimplementedRpcFileServer) SetLk(context.Context, *SetLkRequest) (*SetLkReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetLk not implemented")
+}
+func (UnimplementedRpcFileServer) SetLkw(context.Context, *SetLkwRequest) (*SetLkwReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetLkw not implemented")
 }
 func (UnimplementedRpcFileServer) mustEmbedUnimplementedRpcFileServer() {}
 
@@ -184,6 +268,114 @@ func _RpcFile_Write_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RpcFile_Release_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReleaseRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RpcFileServer).Release(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gmountie.RpcFile/Release",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RpcFileServer).Release(ctx, req.(*ReleaseRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RpcFile_Fsync_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FsyncRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RpcFileServer).Fsync(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gmountie.RpcFile/Fsync",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RpcFileServer).Fsync(ctx, req.(*FsyncRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RpcFile_Flush_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FlushRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RpcFileServer).Flush(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gmountie.RpcFile/Flush",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RpcFileServer).Flush(ctx, req.(*FlushRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RpcFile_GetLk_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetLkRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RpcFileServer).GetLk(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gmountie.RpcFile/GetLk",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RpcFileServer).GetLk(ctx, req.(*GetLkRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RpcFile_SetLk_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetLkRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RpcFileServer).SetLk(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gmountie.RpcFile/SetLk",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RpcFileServer).SetLk(ctx, req.(*SetLkRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RpcFile_SetLkw_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetLkwRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RpcFileServer).SetLkw(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gmountie.RpcFile/SetLkw",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RpcFileServer).SetLkw(ctx, req.(*SetLkwRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // RpcFile_ServiceDesc is the grpc.ServiceDesc for RpcFile service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -206,6 +398,30 @@ var RpcFile_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Write",
 			Handler:    _RpcFile_Write_Handler,
+		},
+		{
+			MethodName: "Release",
+			Handler:    _RpcFile_Release_Handler,
+		},
+		{
+			MethodName: "Fsync",
+			Handler:    _RpcFile_Fsync_Handler,
+		},
+		{
+			MethodName: "Flush",
+			Handler:    _RpcFile_Flush_Handler,
+		},
+		{
+			MethodName: "GetLk",
+			Handler:    _RpcFile_GetLk_Handler,
+		},
+		{
+			MethodName: "SetLk",
+			Handler:    _RpcFile_SetLk_Handler,
+		},
+		{
+			MethodName: "SetLkw",
+			Handler:    _RpcFile_SetLkw_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

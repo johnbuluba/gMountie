@@ -4,6 +4,14 @@ option go_package = "pkg/proto";
 
 import "api/proto/common.proto";
 
+message FileLock {
+  uint64 start = 1;
+  uint64 end = 2;
+  uint32 typ= 3;
+  uint32 pid = 4;
+}
+
+
 message OpenRequest {
   Caller caller = 1;
   string path = 2;
@@ -48,9 +56,73 @@ message WriteReply {
   int32 status = 2;
 }
 
+message FsyncRequest {
+  string path = 1;
+  int64 flags = 2;
+}
+
+message FsyncReply {
+  int32 status = 1;
+}
+
+message ReleaseRequest {
+  string path = 1;
+}
+
+message ReleaseReply {
+}
+
+message FlushRequest {
+  string path = 1;
+}
+
+message FlushReply {
+  int32 status = 1;
+}
+
+message GetLkRequest {
+  string path = 1;
+  uint64 owner = 2;
+  uint32 flags = 3;
+  FileLock lk = 4;
+}
+
+message GetLkReply {
+  int32 status = 1;
+  FileLock lk = 2;
+}
+
+message SetLkRequest {
+  string path = 1;
+  uint64 owner = 2;
+  uint32 flags = 3;
+  FileLock lk = 4;
+}
+
+message SetLkReply {
+  int32 status = 1;
+}
+
+message SetLkwRequest {
+  string path = 1;
+  uint64 owner = 2;
+  uint32 flags = 3;
+  FileLock lk = 4;
+}
+
+message SetLkwReply {
+  int32 status = 1;
+}
+
 service RpcFile {
   rpc Open (OpenRequest) returns (OpenReply);
   rpc Create (CreateRequest) returns (CreateReply);
   rpc Read (ReadRequest) returns (ReadReply);
   rpc Write (WriteRequest) returns (WriteReply);
+  rpc Release (ReleaseRequest) returns (ReleaseReply);
+  rpc Fsync (FsyncRequest) returns (FsyncReply);
+  rpc Flush (FlushRequest) returns (FlushReply);
+  rpc GetLk (GetLkRequest) returns (GetLkReply);
+  rpc SetLk (SetLkRequest) returns (SetLkReply);
+  rpc SetLkw (SetLkwRequest) returns (SetLkwReply);
 }
