@@ -33,6 +33,7 @@ type RpcFsClient interface {
 	Mkdir(ctx context.Context, in *MkdirRequest, opts ...grpc.CallOption) (*MkdirReply, error)
 	Rmdir(ctx context.Context, in *RmdirRequest, opts ...grpc.CallOption) (*RmdirReply, error)
 	Rename(ctx context.Context, in *RenameRequest, opts ...grpc.CallOption) (*RenameReply, error)
+	GetXAttr(ctx context.Context, in *GetXAttrRequest, opts ...grpc.CallOption) (*GetXAttrReply, error)
 }
 
 type rpcFsClient struct {
@@ -142,6 +143,15 @@ func (c *rpcFsClient) Rename(ctx context.Context, in *RenameRequest, opts ...grp
 	return out, nil
 }
 
+func (c *rpcFsClient) GetXAttr(ctx context.Context, in *GetXAttrRequest, opts ...grpc.CallOption) (*GetXAttrReply, error) {
+	out := new(GetXAttrReply)
+	err := c.cc.Invoke(ctx, "/gmountie.RpcFs/GetXAttr", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RpcFsServer is the server API for RpcFs service.
 // All implementations must embed UnimplementedRpcFsServer
 // for forward compatibility
@@ -157,6 +167,7 @@ type RpcFsServer interface {
 	Mkdir(context.Context, *MkdirRequest) (*MkdirReply, error)
 	Rmdir(context.Context, *RmdirRequest) (*RmdirReply, error)
 	Rename(context.Context, *RenameRequest) (*RenameReply, error)
+	GetXAttr(context.Context, *GetXAttrRequest) (*GetXAttrReply, error)
 	mustEmbedUnimplementedRpcFsServer()
 }
 
@@ -196,6 +207,9 @@ func (UnimplementedRpcFsServer) Rmdir(context.Context, *RmdirRequest) (*RmdirRep
 }
 func (UnimplementedRpcFsServer) Rename(context.Context, *RenameRequest) (*RenameReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Rename not implemented")
+}
+func (UnimplementedRpcFsServer) GetXAttr(context.Context, *GetXAttrRequest) (*GetXAttrReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetXAttr not implemented")
 }
 func (UnimplementedRpcFsServer) mustEmbedUnimplementedRpcFsServer() {}
 
@@ -408,6 +422,24 @@ func _RpcFs_Rename_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RpcFs_GetXAttr_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetXAttrRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RpcFsServer).GetXAttr(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gmountie.RpcFs/GetXAttr",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RpcFsServer).GetXAttr(ctx, req.(*GetXAttrRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // RpcFs_ServiceDesc is the grpc.ServiceDesc for RpcFs service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -458,6 +490,10 @@ var RpcFs_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Rename",
 			Handler:    _RpcFs_Rename_Handler,
+		},
+		{
+			MethodName: "GetXAttr",
+			Handler:    _RpcFs_GetXAttr_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

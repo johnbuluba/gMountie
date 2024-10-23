@@ -181,6 +181,18 @@ func (fs *GrpcInode) Chown(name string, uid uint32, gid uint32, context *fuse.Co
 	return fuse.Status(res.Status)
 }
 
+// ------------------- Extended attributes -------------------
+
+// GetXAttr gets an extended attribute
+func (fs *GrpcInode) GetXAttr(name string, attribute string, context *fuse.Context) (data []byte, code fuse.Status) {
+	res, err := fs.client.Fs.GetXAttr(context, &proto.GetXAttrRequest{Caller: createCaller(context), Path: name, Attribute: attribute})
+	if err != nil || res == nil {
+		common.Log.Error("error in call: GetXAttr", zap.String("path", name), zap.Error(err))
+		return nil, fuse.EIO
+	}
+	return res.Data, fuse.Status(res.Status)
+}
+
 func (fs *GrpcInode) StatFs(name string) *fuse.StatfsOut {
 	res, err := fs.client.Fs.StatFs(context.Background(), &proto.StatFsRequest{Path: name})
 	if err != nil || res == nil {

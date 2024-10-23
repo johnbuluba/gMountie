@@ -148,6 +148,17 @@ message RenameReply {
   int32 status = 1;
 }
 
+message GetXAttrRequest {
+  Caller caller = 1;
+  string path = 2;
+  string attribute = 3;
+}
+
+message GetXAttrReply {
+  bytes data = 1;
+  int32 status = 2;
+}
+
 service RpcFs {
   rpc GetAttr (GetAttrRequest) returns (GetAttrReply);
   rpc StatFs (StatFsRequest) returns (StatFsReply);
@@ -160,5 +171,6 @@ service RpcFs {
   rpc Mkdir (MkdirRequest) returns (MkdirReply);
   rpc Rmdir (RmdirRequest) returns (RmdirReply);
   rpc Rename (RenameRequest) returns (RenameReply);
+  rpc GetXAttr (GetXAttrRequest) returns (GetXAttrReply);
 }
 

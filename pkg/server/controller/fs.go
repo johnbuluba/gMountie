@@ -184,3 +184,15 @@ func (r *RpcServerImpl) Chown(ctx context.Context, request *proto.ChownRequest) 
 	status := fs.Chown(request.Path, request.Uid, request.Gid, createContext(ctx, request.Caller))
 	return &proto.ChownReply{Status: int32(status)}, nil
 }
+
+// ----- Extended attributes -----
+
+// GetXAttr gets an extended attribute
+func (r *RpcServerImpl) GetXAttr(ctx context.Context, request *proto.GetXAttrRequest) (*proto.GetXAttrReply, error) {
+	fs, err := r.fsService.GetVolumeFileSystemFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	data, status := fs.GetXAttr(request.Path, request.Attribute, createContext(ctx, request.Caller))
+	return &proto.GetXAttrReply{Data: data, Status: int32(status)}, nil
+}
