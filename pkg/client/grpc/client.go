@@ -35,6 +35,11 @@ func NewClient(endpoint string) (*Client, error) {
 	}, nil
 }
 
+// Connect connects to the gRPC server
+func (c *Client) Connect() {
+	c.conn.Connect()
+}
+
 // GetInterceptors returns the client interceptors
 func getInterceptors() []grpc.UnaryClientInterceptor {
 	return []grpc.UnaryClientInterceptor{}

@@ -10,18 +10,11 @@ package main
 import (
 	"flag"
 	"gmountie/pkg/client/grpc"
-	"gmountie/pkg/client/io"
+	"gmountie/pkg/client/service"
 	"gmountie/pkg/utils/log"
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
-
-	"github.com/avast/retry-go/v4"
-	"github.com/hanwen/go-fuse/v2/fuse"
-	"github.com/hanwen/go-fuse/v2/fuse/nodefs"
-	"github.com/hanwen/go-fuse/v2/fuse/pathfs"
-	"go.uber.org/zap"
 )
 
 func main() {
@@ -34,54 +27,24 @@ func main() {
 	//client, err := grpc.NewClient("gmountie.home.buluba.net:443", "data")
 	client, err := grpc.NewClient("localhost:9449")
 	if err != nil {
-		log.Log.Sugar().Fatalf("Failed to create client: %v", err)
+		log.Log.Sugar().Fatalf("failed to create client: %v", err)
 	}
+	client.Connect()
 
-	fs := io.NewLocalFileSystem(client, "test")
-	fs.SetDebug(true)
-	nodeFS := pathfs.NewPathNodeFs(fs, &pathfs.PathNodeFsOptions{ClientInodes: true, Debug: true})
-	opts := nodefs.NewOptions()
-	opts.Debug = true
-	sec := time.Second
-	connector := nodefs.NewFileSystemConnector(nodeFS.Root(),
-		&nodefs.Options{
-			EntryTimeout:        sec,
-			AttrTimeout:         sec,
-			NegativeTimeout:     0.0,
-			Debug:               true,
-			LookupKnownChildren: true,
-		})
-
-	server, err := fuse.NewServer(
-		connector.RawFS(), flag.Arg(0), &fuse.MountOptions{
-			AllowOther:     true,
-			SingleThreaded: false,
-			Debug:          true,
-			Logger:         zap.NewStdLog(log.Log),
-		})
+	mounter := service.NewMounterService(client)
+	err = mounter.Mount("test", flag.Arg(0))
 	if err != nil {
-		log.Log.Sugar().Fatalf("Mount fail: %v\n", err)
+		log.Log.Sugar().Fatalf("failed to mount: %v", err)
+		return
 	}
+
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-	go func() {
-		<-c
-		errRetry := retry.Do(
-			func() error {
-				err = server.Unmount()
-				if err != nil {
-					log.Log.Sugar().Errorf("Unmount fail: %v", err)
-					return err
-				}
-				return nil
-			},
-			retry.Attempts(3),
-			retry.Delay(5*time.Second),
-		)
-		if errRetry != nil {
-			log.Log.Sugar().Fatalf("Unmount fail, giving up: %v\n", errRetry)
-		}
-	}()
-	server.Serve()
-	server.Wait()
+	<-c
+	err = mounter.UnmountAll()
+	if err != nil {
+		log.Log.Sugar().Fatalf("failed to unmount: %v", err)
+		return
+	}
+
 }
