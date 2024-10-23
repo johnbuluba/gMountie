@@ -1,0 +1,47 @@
+{
+  "name": "ui",
+  "frontend:build": "npm run build",
+  "frontend:install": "npm install",
+  "frontend:dev": "",
+  "frontend:dev:build": "",
+  "frontend:dev:install": "",
+  "frontend:dev:watcher": "npm run dev",
+  "frontend:dev:serverUrl": "auto",
+  "wailsjsdir": "/home/john/git/gmountie/ui/frontend",
+  "version": "2",
+  "projectdir": "/home/john/git/gmountie/ui",
+  "build:dir": "build",
+  "outputfilename": "ui",
+  "OutputType": "",
+  "Platform": "",
+  "runNonNativeBuildHooks": false,
+  "postBuildHooks": null,
+  "preBuildHooks": null,
+  "Author": {
+    "name": "Ioannis Bouloumpasis",
+    "email": "ioannis.bouloumpasis@hpe.com"
+  },
+  "Info": {
+    "companyName": "ui",
+    "productName": "ui",
+    "productVersion": "1.0.0",
+    "copyright": "Copyright.........",
+    "comments": "Built using Wails (https://wails.io)",
+    "fileAssociations": null,
+    "protocols": null
+  },
+  "debounceMS": 100,
+  "devServer": "localhost:34115",
+  "appargs": "",
+  "nsisType": "multiple",
+  "obfuscated": false,
+  "garbleargs": "",
+  "frontend:dir": "frontend",
+  "bindings": {
+    "ts_generation": {
+      "prefix": "",
+      "suffix": "",
+      "outputType": ""
+    }
+  }
+}
