@@ -9,19 +9,19 @@ import (
 
 // Client is a struct that holds the gRPC client
 type Client struct {
-	volume string
 	conn   *grpc.ClientConn
 	Fs     proto.RpcFsClient
 	File   proto.RpcFileClient
+	Volume proto.VolumeServiceClient
 }
 
-func NewClient(endpoint string, volume string) (*Client, error) {
+func NewClient(endpoint string) (*Client, error) {
 	conn, err := grpc.NewClient(
 		endpoint,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		//grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{})),
 		grpc.WithChainUnaryInterceptor(
-			getInterceptors(volume)...,
+			getInterceptors()...,
 		),
 	)
 	if err != nil {
@@ -29,15 +29,13 @@ func NewClient(endpoint string, volume string) (*Client, error) {
 	}
 	return &Client{
 		conn:   conn,
-		volume: volume,
 		Fs:     proto.NewRpcFsClient(conn),
 		File:   proto.NewRpcFileClient(conn),
+		Volume: proto.NewVolumeServiceClient(conn),
 	}, nil
 }
 
 // GetInterceptors returns the client interceptors
-func getInterceptors(volume string) []grpc.UnaryClientInterceptor {
-	return []grpc.UnaryClientInterceptor{
-		NewVolumeInterceptor(volume),
-	}
+func getInterceptors() []grpc.UnaryClientInterceptor {
+	return []grpc.UnaryClientInterceptor{}
 }

@@ -11,8 +11,7 @@ import (
 	"flag"
 	"gmountie/pkg/client/grpc"
 	"gmountie/pkg/client/io"
-	"gmountie/pkg/common"
-	"log"
+	"gmountie/pkg/utils/log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -28,17 +27,17 @@ import (
 func main() {
 	flag.Parse()
 	if len(flag.Args()) < 1 {
-		log.Fatal("Usage:\n  hello MOUNTPOINT")
+		log.Log.Sugar().Fatalf("Usage:\n  hello MOUNTPOINT")
 	}
 
 	//client, err := grpc.NewClient("192.168.11.42:9449", "data")
 	//client, err := grpc.NewClient("gmountie.home.buluba.net:443", "data")
-	client, err := grpc.NewClient("localhost:9449", "test")
+	client, err := grpc.NewClient("localhost:9449")
 	if err != nil {
-		log.Fatalf("Failed to create client: %v", err)
+		log.Log.Sugar().Fatalf("Failed to create client: %v", err)
 	}
 
-	fs := io.NewGrpcInode(client)
+	fs := io.NewLocalFileSystem(client, "test")
 	fs.SetDebug(true)
 	nodeFS := pathfs.NewPathNodeFs(fs, &pathfs.PathNodeFsOptions{ClientInodes: true, Debug: true})
 	opts := nodefs.NewOptions()
@@ -52,16 +51,16 @@ func main() {
 			Debug:               true,
 			LookupKnownChildren: true,
 		})
-	zap.NewStdLog(common.Log)
+
 	server, err := fuse.NewServer(
 		connector.RawFS(), flag.Arg(0), &fuse.MountOptions{
 			AllowOther:     true,
 			SingleThreaded: false,
 			Debug:          true,
-			Logger:         zap.NewStdLog(common.Log),
+			Logger:         zap.NewStdLog(log.Log),
 		})
 	if err != nil {
-		log.Fatalf("Mount fail: %v\n", err)
+		log.Log.Sugar().Fatalf("Mount fail: %v\n", err)
 	}
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
@@ -71,7 +70,7 @@ func main() {
 			func() error {
 				err = server.Unmount()
 				if err != nil {
-					common.Log.Sugar().Errorf("Unmount fail: %v", err)
+					log.Log.Sugar().Errorf("Unmount fail: %v", err)
 					return err
 				}
 				return nil
@@ -80,7 +79,7 @@ func main() {
 			retry.Delay(5*time.Second),
 		)
 		if errRetry != nil {
-			common.Log.Sugar().Fatalf("Unmount fail, giving up: %v\n", errRetry)
+			log.Log.Sugar().Fatalf("Unmount fail, giving up: %v\n", errRetry)
 		}
 	}()
 	server.Serve()

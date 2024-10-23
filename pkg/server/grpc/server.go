@@ -2,8 +2,8 @@ package grpc
 
 import (
 	"fmt"
-	"gmountie/pkg/common"
 	"gmountie/pkg/server/config"
+	"gmountie/pkg/utils/log"
 	"net"
 
 	_ "gmountie/pkg/server/grpc/snappy" // Installing the snappy encoding as an available compressor.
@@ -52,10 +52,10 @@ func (s *Server) Serve() error {
 	// Add reflection.
 	reflection.Register(s.server)
 	// Log enabled services.
-	for name, _ := range s.server.GetServiceInfo() {
-		common.Log.Info("gRPC service is enabled", zap.String("service", name))
+	for name := range s.server.GetServiceInfo() {
+		log.Log.Info("gRPC service is enabled", zap.String("service", name))
 	}
-	common.Log.Info("gRPC server is running", zap.String("address", lis.Addr().String()))
+	log.Log.Info("gRPC server is running", zap.String("address", lis.Addr().String()))
 	// Serve the gRPC server.
 	return s.server.Serve(lis)
 }
@@ -100,7 +100,7 @@ func (s *Server) getLoggingInterceptor() (grpc.UnaryServerInterceptor, grpc.Stre
 		logging.WithLogOnEvents(logging.StartCall, logging.FinishCall),
 		// Add any other option (check functions starting with logging.With).
 	}
-	unary := logging.UnaryServerInterceptor(InterceptorLogger(common.Log), opts...)
-	stream := logging.StreamServerInterceptor(InterceptorLogger(common.Log), opts...)
+	unary := logging.UnaryServerInterceptor(InterceptorLogger(log.Log), opts...)
+	stream := logging.StreamServerInterceptor(InterceptorLogger(log.Log), opts...)
 	return unary, stream
 }

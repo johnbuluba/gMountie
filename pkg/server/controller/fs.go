@@ -29,7 +29,7 @@ func (r *RpcServerImpl) Register(server *grpc.Server) {
 }
 
 func (r *RpcServerImpl) GetAttr(ctx context.Context, request *proto.GetAttrRequest) (*proto.GetAttrReply, error) {
-	fs, err := r.fsService.GetVolumeFileSystemFromContext(ctx)
+	fs, err := r.fsService.GetVolumeFileSystem(request.Volume)
 	if err != nil {
 		return nil, err
 	}
@@ -62,9 +62,8 @@ func (r *RpcServerImpl) GetAttr(ctx context.Context, request *proto.GetAttrReque
 	return reply, nil
 }
 
-// Mkdir creates a new directory
 func (r *RpcServerImpl) Mkdir(ctx context.Context, request *proto.MkdirRequest) (*proto.MkdirReply, error) {
-	fs, err := r.fsService.GetVolumeFileSystemFromContext(ctx)
+	fs, err := r.fsService.GetVolumeFileSystem(request.Volume)
 	if err != nil {
 		return nil, err
 	}
@@ -72,9 +71,8 @@ func (r *RpcServerImpl) Mkdir(ctx context.Context, request *proto.MkdirRequest) 
 	return &proto.MkdirReply{Status: int32(status)}, nil
 }
 
-// Rmdir removes a directory
 func (r *RpcServerImpl) Rmdir(ctx context.Context, request *proto.RmdirRequest) (*proto.RmdirReply, error) {
-	fs, err := r.fsService.GetVolumeFileSystemFromContext(ctx)
+	fs, err := r.fsService.GetVolumeFileSystem(request.Volume)
 	if err != nil {
 		return nil, err
 	}
@@ -82,9 +80,8 @@ func (r *RpcServerImpl) Rmdir(ctx context.Context, request *proto.RmdirRequest) 
 	return &proto.RmdirReply{Status: int32(status)}, nil
 }
 
-// Rename renames a file
 func (r *RpcServerImpl) Rename(ctx context.Context, request *proto.RenameRequest) (*proto.RenameReply, error) {
-	fs, err := r.fsService.GetVolumeFileSystemFromContext(ctx)
+	fs, err := r.fsService.GetVolumeFileSystem(request.Volume)
 	if err != nil {
 		return nil, err
 	}
@@ -92,9 +89,8 @@ func (r *RpcServerImpl) Rename(ctx context.Context, request *proto.RenameRequest
 	return &proto.RenameReply{Status: int32(status)}, nil
 }
 
-// OpenDir opens a directory
 func (r *RpcServerImpl) OpenDir(ctx context.Context, request *proto.OpenDirRequest) (*proto.OpenDirReply, error) {
-	fs, err := r.fsService.GetVolumeFileSystemFromContext(ctx)
+	fs, err := r.fsService.GetVolumeFileSystem(request.Volume)
 	if err != nil {
 		return nil, err
 	}
@@ -103,9 +99,9 @@ func (r *RpcServerImpl) OpenDir(ctx context.Context, request *proto.OpenDirReque
 	entries := make([]*proto.DirEntry, len(dirs))
 	for i, dir := range dirs {
 		entries[i] = &proto.DirEntry{
+			Mode: dir.Mode,
 			Name: dir.Name,
 			Ino:  dir.Ino,
-			Mode: dir.Mode,
 			Off:  dir.Off,
 		}
 	}
@@ -117,7 +113,7 @@ func (r *RpcServerImpl) OpenDir(ctx context.Context, request *proto.OpenDirReque
 }
 
 func (r *RpcServerImpl) StatFs(ctx context.Context, request *proto.StatFsRequest) (*proto.StatFsReply, error) {
-	fs, err := r.fsService.GetVolumeFileSystemFromContext(ctx)
+	fs, err := r.fsService.GetVolumeFileSystem(request.Volume)
 	if err != nil {
 		return nil, err
 	}
@@ -135,9 +131,8 @@ func (r *RpcServerImpl) StatFs(ctx context.Context, request *proto.StatFsRequest
 	return reply, nil
 }
 
-// Unlink removes a file
 func (r *RpcServerImpl) Unlink(ctx context.Context, request *proto.UnlinkRequest) (*proto.UnlinkReply, error) {
-	fs, err := r.fsService.GetVolumeFileSystemFromContext(ctx)
+	fs, err := r.fsService.GetVolumeFileSystem(request.Volume)
 	if err != nil {
 		return nil, err
 	}
@@ -145,9 +140,8 @@ func (r *RpcServerImpl) Unlink(ctx context.Context, request *proto.UnlinkRequest
 	return &proto.UnlinkReply{Status: int32(status)}, nil
 }
 
-// Access checks if a file can be accessed
 func (r *RpcServerImpl) Access(ctx context.Context, request *proto.AccessRequest) (*proto.AccessReply, error) {
-	fs, err := r.fsService.GetVolumeFileSystemFromContext(ctx)
+	fs, err := r.fsService.GetVolumeFileSystem(request.Volume)
 	if err != nil {
 		return nil, err
 	}
@@ -155,9 +149,8 @@ func (r *RpcServerImpl) Access(ctx context.Context, request *proto.AccessRequest
 	return &proto.AccessReply{Status: int32(status)}, nil
 }
 
-// Truncate changes the size of a file
 func (r *RpcServerImpl) Truncate(ctx context.Context, request *proto.TruncateRequest) (*proto.TruncateReply, error) {
-	fs, err := r.fsService.GetVolumeFileSystemFromContext(ctx)
+	fs, err := r.fsService.GetVolumeFileSystem(request.Volume)
 	if err != nil {
 		return nil, err
 	}
@@ -165,9 +158,8 @@ func (r *RpcServerImpl) Truncate(ctx context.Context, request *proto.TruncateReq
 	return &proto.TruncateReply{Status: int32(status)}, nil
 }
 
-// Chmod changes the mode of a file
 func (r *RpcServerImpl) Chmod(ctx context.Context, request *proto.ChmodRequest) (*proto.ChmodReply, error) {
-	fs, err := r.fsService.GetVolumeFileSystemFromContext(ctx)
+	fs, err := r.fsService.GetVolumeFileSystem(request.Volume)
 	if err != nil {
 		return nil, err
 	}
@@ -175,9 +167,8 @@ func (r *RpcServerImpl) Chmod(ctx context.Context, request *proto.ChmodRequest) 
 	return &proto.ChmodReply{Status: int32(status)}, nil
 }
 
-// Chown changes the owner of a file
 func (r *RpcServerImpl) Chown(ctx context.Context, request *proto.ChownRequest) (*proto.ChownReply, error) {
-	fs, err := r.fsService.GetVolumeFileSystemFromContext(ctx)
+	fs, err := r.fsService.GetVolumeFileSystem(request.Volume)
 	if err != nil {
 		return nil, err
 	}
@@ -187,9 +178,8 @@ func (r *RpcServerImpl) Chown(ctx context.Context, request *proto.ChownRequest) 
 
 // ----- Extended attributes -----
 
-// GetXAttr gets an extended attribute
 func (r *RpcServerImpl) GetXAttr(ctx context.Context, request *proto.GetXAttrRequest) (*proto.GetXAttrReply, error) {
-	fs, err := r.fsService.GetVolumeFileSystemFromContext(ctx)
+	fs, err := r.fsService.GetVolumeFileSystem(request.Volume)
 	if err != nil {
 		return nil, err
 	}

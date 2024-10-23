@@ -31,7 +31,6 @@ func NewRpcFileServer(fsService service.VolumeService) *RpcFileServerImpl {
 	return &RpcFileServerImpl{
 		fsService: fsService,
 		files:     xsync.NewMapOf[string, *fileEntry](),
-		//files:     make(map[string]*fileEntry),
 	}
 }
 
@@ -41,7 +40,7 @@ func (r *RpcFileServerImpl) Register(server *grpc.Server) {
 }
 
 func (r *RpcFileServerImpl) Open(ctx context.Context, request *proto.OpenRequest) (*proto.OpenReply, error) {
-	fs, err := r.fsService.GetVolumeFileSystemFromContext(ctx)
+	fs, err := r.fsService.GetVolumeFileSystem(request.Volume)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +53,7 @@ func (r *RpcFileServerImpl) Open(ctx context.Context, request *proto.OpenRequest
 }
 
 func (r *RpcFileServerImpl) Create(ctx context.Context, request *proto.CreateRequest) (*proto.CreateReply, error) {
-	fs, err := r.fsService.GetVolumeFileSystemFromContext(ctx)
+	fs, err := r.fsService.GetVolumeFileSystem(request.Volume)
 	if err != nil {
 		return nil, err
 	}

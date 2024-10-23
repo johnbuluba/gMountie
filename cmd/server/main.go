@@ -2,11 +2,11 @@ package main
 
 import (
 	"flag"
-	"gmountie/pkg/common"
 	"gmountie/pkg/server/config"
 	"gmountie/pkg/server/controller"
 	"gmountie/pkg/server/grpc"
 	"gmountie/pkg/server/service"
+	"gmountie/pkg/utils/log"
 	"os"
 
 	"github.com/pkg/errors"
@@ -47,15 +47,15 @@ func main() {
 	if len(flag.Args()) == 1 {
 		data, err := os.ReadFile(flag.Arg(0))
 		if err != nil {
-			common.Log.Sugar().Fatalf("failed to read config file: %v", err)
+			log.Log.Sugar().Fatalf("failed to read config file: %v", err)
 		}
 		cfg = string(data)
 	} else {
-		common.Log.Info("using default configuration")
+		log.Log.Info("using default configuration")
 	}
 
 	err := Start(cfg)
 	if err != nil {
-		common.Log.Sugar().Fatalf("failed to start server: %v", err)
+		log.Log.Sugar().Fatalf("failed to start server: %v", err)
 	}
 }

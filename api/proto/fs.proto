@@ -32,7 +32,8 @@ message Attr {
 }
 
 message StatFsRequest {
-  string path = 1;
+  string volume = 1;
+  string path = 2;
 }
 
 message StatFsReply {
@@ -48,10 +49,10 @@ message StatFsReply {
   repeated uint32 spare = 10 [packed = true];
 }
 
-
 message GetAttrRequest {
-  Caller caller = 1;
-  string path = 2;
+  string volume = 1;
+  Caller caller = 2;
+  string path = 3;
 }
 
 message GetAttrReply {
@@ -60,8 +61,9 @@ message GetAttrReply {
 }
 
 message OpenDirRequest {
-  Caller caller = 1;
-  string path = 2;
+  string volume = 1;
+  Caller caller = 2;
+  string path = 3;
 }
 
 message OpenDirReply {
@@ -70,8 +72,9 @@ message OpenDirReply {
 }
 
 message UnlinkRequest {
-  Caller caller = 1;
-  string path = 2;
+  string volume = 1;
+  Caller caller = 2;
+  string path = 3;
 }
 
 message UnlinkReply {
@@ -79,9 +82,10 @@ message UnlinkReply {
 }
 
 message AccessRequest {
-  Caller caller = 1;
-  string path = 2;
-  uint32 mode = 3;
+  string volume = 1;
+  Caller caller = 2;
+  string path = 3;
+  uint32 mode = 4;
 }
 
 message AccessReply {
@@ -89,9 +93,10 @@ message AccessReply {
 }
 
 message TruncateRequest {
-  Caller caller = 1;
-  string path = 2;
-  uint64 size = 3;
+  string volume = 1;
+  Caller caller = 2;
+  string path = 3;
+  uint64 size = 4;
 }
 
 message TruncateReply {
@@ -99,10 +104,11 @@ message TruncateReply {
 }
 
 message ChownRequest {
-  Caller caller = 1;
-  string path = 2;
-  uint32 uid = 3;
-  uint32 gid = 4;
+  string volume = 1;
+  Caller caller = 2;
+  string path = 3;
+  uint32 uid = 4;
+  uint32 gid = 5;
 }
 
 message ChownReply {
@@ -110,9 +116,10 @@ message ChownReply {
 }
 
 message ChmodRequest {
-  Caller caller = 1;
-  string path = 2;
-  uint32 mode = 3;
+  string volume = 1;
+  Caller caller = 2;
+  string path = 3;
+  uint32 mode = 4;
 }
 
 message ChmodReply {
@@ -120,9 +127,10 @@ message ChmodReply {
 }
 
 message MkdirRequest {
-  Caller caller = 1;
-  string path = 2;
-  uint32 mode = 3;
+  string volume = 1;
+  Caller caller = 2;
+  string path = 3;
+  uint32 mode = 4;
 }
 
 message MkdirReply {
@@ -130,8 +138,9 @@ message MkdirReply {
 }
 
 message RmdirRequest {
-  Caller caller = 1;
-  string path = 2;
+  string volume = 1;
+  Caller caller = 2;
+  string path = 3;
 }
 
 message RmdirReply {
@@ -139,9 +148,10 @@ message RmdirReply {
 }
 
 message RenameRequest {
-  Caller caller = 1;
-  string old_name = 2;
-  string new_name = 3;
+  string volume = 1;
+  Caller caller = 2;
+  string old_name = 3;
+  string new_name = 4;
 }
 
 message RenameReply {
@@ -149,9 +159,10 @@ message RenameReply {
 }
 
 message GetXAttrRequest {
-  Caller caller = 1;
-  string path = 2;
-  string attribute = 3;
+  string volume = 1;
+  Caller caller = 2;
+  string path = 3;
+  string attribute = 4;
 }
 
 message GetXAttrReply {
@@ -173,4 +184,3 @@ service RpcFs {
   rpc Rename (RenameRequest) returns (RenameReply);
   rpc GetXAttr (GetXAttrRequest) returns (GetXAttrReply);
 }
-

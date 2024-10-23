@@ -7,15 +7,15 @@ import "api/proto/common.proto";
 message FileLock {
   uint64 start = 1;
   uint64 end = 2;
-  uint32 typ= 3;
+  uint32 typ = 3;
   uint32 pid = 4;
 }
 
-
 message OpenRequest {
-  Caller caller = 1;
-  string path = 2;
-  uint32 flags = 3;
+  string volume = 1;
+  Caller caller = 2;
+  string path = 3;
+  uint32 flags = 4;
 }
 
 message OpenReply {
@@ -23,10 +23,11 @@ message OpenReply {
 }
 
 message CreateRequest {
-  Caller caller = 1;
-  string path = 2;
-  uint32 flags = 3;
-  uint32 mode = 4;
+  string volume = 1;
+  Caller caller = 2;
+  string path = 3;
+  uint32 flags = 4;
+  uint32 mode = 5;
 }
 
 message CreateReply {
@@ -34,9 +35,10 @@ message CreateReply {
 }
 
 message ReadRequest {
-  string path = 1;
-  int64 offset = 2;
-  uint32 size = 3;
+  string volume = 1;
+  string path = 2;
+  int64 offset = 3;
+  uint32 size = 4;
 }
 
 message ReadReply {
@@ -46,9 +48,10 @@ message ReadReply {
 }
 
 message WriteRequest {
-  string path = 1;
-  bytes bytes = 2;
-  int64 offset = 3;
+  string volume = 1;
+  string path = 2;
+  bytes bytes = 3;
+  int64 offset = 4;
 }
 
 message WriteReply {
@@ -57,8 +60,9 @@ message WriteReply {
 }
 
 message FsyncRequest {
-  string path = 1;
-  int64 flags = 2;
+  string volume = 1;
+  string path = 2;
+  int64 flags = 3;
 }
 
 message FsyncReply {
@@ -66,14 +70,16 @@ message FsyncReply {
 }
 
 message ReleaseRequest {
-  string path = 1;
+  string volume = 1;
+  string path = 2;
 }
 
 message ReleaseReply {
 }
 
 message FlushRequest {
-  string path = 1;
+  string volume = 1;
+  string path = 2;
 }
 
 message FlushReply {
@@ -81,10 +87,11 @@ message FlushReply {
 }
 
 message GetLkRequest {
-  string path = 1;
-  uint64 owner = 2;
-  uint32 flags = 3;
-  FileLock lk = 4;
+  string volume = 1;
+  string path = 2;
+  uint64 owner = 3;
+  uint32 flags = 4;
+  FileLock lk = 5;
 }
 
 message GetLkReply {
@@ -93,10 +100,11 @@ message GetLkReply {
 }
 
 message SetLkRequest {
-  string path = 1;
-  uint64 owner = 2;
-  uint32 flags = 3;
-  FileLock lk = 4;
+  string volume = 1;
+  string path = 2;
+  uint64 owner = 3;
+  uint32 flags = 4;
+  FileLock lk = 5;
 }
 
 message SetLkReply {
@@ -104,10 +112,11 @@ message SetLkReply {
 }
 
 message SetLkwRequest {
-  string path = 1;
-  uint64 owner = 2;
-  uint32 flags = 3;
-  FileLock lk = 4;
+  string volume = 1;
+  string path = 2;
+  uint64 owner = 3;
+  uint32 flags = 4;
+  FileLock lk = 5;
 }
 
 message SetLkwReply {
