@@ -18,6 +18,7 @@ type Client struct {
 func NewClient(endpoint string) (*Client, error) {
 	conn, err := grpc.NewClient(
 		endpoint,
+		grpc.WithPerRPCCredentials(NewBasicAuthCredentials("john", "123456")),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		//grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{})),
 		grpc.WithChainUnaryInterceptor(

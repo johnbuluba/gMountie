@@ -15,6 +15,11 @@ import (
 const Config = `
 server:
   address: 127.0.0.1
+auth:
+  type: basic
+  users:
+    - username: john
+      password: 123456
 volumes:
 - name: test
   path: /home/john/mnt/test
@@ -28,7 +33,8 @@ func Start(cfgString string) error {
 	}
 
 	volumeService := service.NewVolumeService(&cfg)
-	server := grpc.NewServer(&cfg, []grpc.ServiceRegistrar{
+	authService := service.NewAuthServiceFromConfig(&cfg)
+	server := grpc.NewServer(&cfg, authService, []grpc.ServiceRegistrar{
 		controller.NewGrpcServer(volumeService),
 		controller.NewRpcFileServer(volumeService),
 		controller.NewVolumeService(volumeService),

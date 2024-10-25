@@ -17,8 +17,11 @@ type Config struct {
 	// Server is the server configuration
 	Server *ServerConfig `validate:"required"`
 
+	// Auth is the auth configuration
+	Auth AuthConfig `validate:"required"`
+
 	// Volumes is the volume configuration
-	Volumes []*VolumeConfig `validate:"required"`
+	Volumes []*VolumeConfig `validate:"required,dive"`
 }
 
 func LoadConfigFromString(cfg string) (Config, error) {
@@ -40,6 +43,13 @@ func ParseConfig(v *viper.Viper) (Config, error) {
 	v.SetDefault("server", make(map[string]string))
 	result.Server = NewServerConfig(v.Sub("server"))
 
+	// Parse the auth configuration.
+	auth, err := NewFromConfig(v.Sub("auth"))
+	if err != nil {
+		return Config{}, err
+	}
+	result.Auth = auth
+
 	// Parse the volume configuration.
 	volumes := make([]*VolumeConfig, 0)
 	for sub, i := v.Sub("volumes.0"), 0; sub != nil; sub = v.Sub(fmt.Sprintf("volumes.%d", i)) {
@@ -50,7 +60,7 @@ func ParseConfig(v *viper.Viper) (Config, error) {
 
 	// Validate.
 	validate := validator.New()
-	err := validate.Struct(result)
+	err = validate.Struct(result)
 	if err != nil {
 		return Config{}, err
 	}

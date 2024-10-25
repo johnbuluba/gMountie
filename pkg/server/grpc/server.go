@@ -3,6 +3,7 @@ package grpc
 import (
 	"fmt"
 	"gmountie/pkg/server/config"
+	"gmountie/pkg/server/service"
 	"gmountie/pkg/utils/log"
 	"net"
 
@@ -23,16 +24,18 @@ type ServiceRegistrar interface {
 
 // Server is a struct that contains a gRPC server.
 type Server struct {
-	config   *config.Config
-	services []ServiceRegistrar
-	server   *grpc.Server
+	config      *config.Config
+	services    []ServiceRegistrar
+	server      *grpc.Server
+	authService service.AuthService
 }
 
 // NewServer creates a new gRPC server.
-func NewServer(config *config.Config, services []ServiceRegistrar) *Server {
+func NewServer(config *config.Config, authService service.AuthService, services []ServiceRegistrar) *Server {
 	return &Server{
-		config:   config,
-		services: services,
+		config:      config,
+		services:    services,
+		authService: authService,
 	}
 }
 
@@ -84,12 +87,15 @@ func (s *Server) createListener() (net.Listener, error) {
 // getOptions returns the gRPC server options.
 func (s *Server) getOptions() []grpc.ServerOption {
 	unaryLog, streamLog := s.getLoggingInterceptor()
+	authInterceptor := NewAuthInterceptor(s.authService)
 	return []grpc.ServerOption{
 		grpc.ChainUnaryInterceptor(
 			unaryLog,
+			authInterceptor.Unary(),
 		),
 		grpc.ChainStreamInterceptor(
 			streamLog,
+			authInterceptor.Stream(),
 		),
 	}
 }
