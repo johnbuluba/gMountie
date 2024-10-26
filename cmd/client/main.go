@@ -25,6 +25,7 @@ func main() {
 
 	//client, err := grpc.NewClient("192.168.11.42:9449", "data")
 	//client, err := grpc.NewClient("gmountie.home.buluba.net:443", "data")
+	//client, err := grpc.NewClient("3.79.246.82:9449")
 	client, err := grpc.NewClient("localhost:9449")
 	if err != nil {
 		log.Log.Sugar().Fatalf("failed to create client: %v", err)
@@ -32,6 +33,16 @@ func main() {
 	client.Connect()
 
 	mounter := service.NewMounterService(client)
+	defer func() {
+		if r := recover(); r != nil {
+			log.Log.Sugar().Errorf("recovered: %v", err)
+		}
+		err := mounter.UnmountAll()
+		if err != nil {
+			log.Log.Sugar().Fatalf("failed to unmount: %v", err)
+			return
+		}
+	}()
 	err = mounter.Mount("test", flag.Arg(0))
 	if err != nil {
 		log.Log.Sugar().Fatalf("failed to mount: %v", err)
@@ -41,10 +52,4 @@ func main() {
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	<-c
-	err = mounter.UnmountAll()
-	if err != nil {
-		log.Log.Sugar().Fatalf("failed to unmount: %v", err)
-		return
-	}
-
 }

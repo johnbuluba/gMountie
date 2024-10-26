@@ -16,14 +16,16 @@ type GrpcFile struct {
 	fileClient proto.RpcFileClient
 	path       string
 	volume     string
+	fd         uint64
 	nodefs.File
 }
 
-func NewGrpcFile(fileClient proto.RpcFileClient, volume, path string) *GrpcFile {
+func NewGrpcFile(fileClient proto.RpcFileClient, volume, path string, fd uint64) *GrpcFile {
 	return &GrpcFile{
 		fileClient: fileClient,
 		path:       path,
 		volume:     volume,
+		fd:         fd,
 		File:       nodefs.NewDefaultFile(),
 	}
 }
@@ -31,7 +33,7 @@ func NewGrpcFile(fileClient proto.RpcFileClient, volume, path string) *GrpcFile 
 func (f *GrpcFile) Read(dest []byte, off int64) (fuse.ReadResult, fuse.Status) {
 	res, err := f.fileClient.Read(context.Background(), &proto.ReadRequest{
 		Volume: f.volume,
-		Path:   f.path,
+		Fd:     f.fd,
 		Offset: off,
 		Size:   uint32(len(dest)),
 	},
@@ -47,7 +49,7 @@ func (f *GrpcFile) Read(dest []byte, off int64) (fuse.ReadResult, fuse.Status) {
 func (f *GrpcFile) Write(data []byte, off int64) (written uint32, code fuse.Status) {
 	res, err := f.fileClient.Write(context.Background(), &proto.WriteRequest{
 		Volume: f.volume,
-		Path:   f.path,
+		Fd:     f.fd,
 		Offset: off,
 		Bytes:  data,
 	},
@@ -63,7 +65,7 @@ func (f *GrpcFile) Write(data []byte, off int64) (written uint32, code fuse.Stat
 func (f *GrpcFile) Release() {
 	_, err := f.fileClient.Release(context.Background(), &proto.ReleaseRequest{
 		Volume: f.volume,
-		Path:   f.path,
+		Fd:     f.fd,
 	})
 	if err != nil {
 		log.Log.Error("error in call: Release", zap.String("path", f.path), zap.Error(err))
@@ -73,7 +75,7 @@ func (f *GrpcFile) Release() {
 func (f *GrpcFile) Flush() fuse.Status {
 	res, err := f.fileClient.Flush(context.Background(), &proto.FlushRequest{
 		Volume: f.volume,
-		Path:   f.path,
+		Fd:     f.fd,
 	})
 	if err != nil {
 		log.Log.Error("error in call: Flush", zap.String("path", f.path), zap.Error(err))
@@ -84,7 +86,7 @@ func (f *GrpcFile) Flush() fuse.Status {
 func (f *GrpcFile) Fsync(flags int) fuse.Status {
 	res, err := f.fileClient.Fsync(context.Background(), &proto.FsyncRequest{
 		Volume: f.volume,
-		Path:   f.path,
+		Fd:     f.fd,
 		Flags:  int64(flags),
 	})
 	if err != nil {
@@ -96,7 +98,7 @@ func (f *GrpcFile) Fsync(flags int) fuse.Status {
 func (f *GrpcFile) GetLk(owner uint64, lk *fuse.FileLock, flags uint32, out *fuse.FileLock) fuse.Status {
 	res, err := f.fileClient.GetLk(context.Background(), &proto.GetLkRequest{
 		Volume: f.volume,
-		Path:   f.path,
+		Fd:     f.fd,
 		Owner:  owner,
 		Flags:  flags,
 		Lk:     &proto.FileLock{Start: lk.Start, End: lk.End, Typ: lk.Typ, Pid: lk.Pid},
@@ -111,7 +113,7 @@ func (f *GrpcFile) GetLk(owner uint64, lk *fuse.FileLock, flags uint32, out *fus
 func (f *GrpcFile) SetLk(owner uint64, lk *fuse.FileLock, flags uint32) fuse.Status {
 	res, err := f.fileClient.SetLk(context.Background(), &proto.SetLkRequest{
 		Volume: f.volume,
-		Path:   f.path,
+		Fd:     f.fd,
 		Owner:  owner,
 		Flags:  flags,
 		Lk:     &proto.FileLock{Start: lk.Start, End: lk.End, Typ: lk.Typ, Pid: lk.Pid},
@@ -125,7 +127,7 @@ func (f *GrpcFile) SetLk(owner uint64, lk *fuse.FileLock, flags uint32) fuse.Sta
 func (f *GrpcFile) SetLkw(owner uint64, lk *fuse.FileLock, flags uint32) fuse.Status {
 	res, err := f.fileClient.SetLkw(context.Background(), &proto.SetLkwRequest{
 		Volume: f.volume,
-		Path:   f.path,
+		Fd:     f.fd,
 		Owner:  owner,
 		Flags:  flags,
 		Lk:     &proto.FileLock{Start: lk.Start, End: lk.End, Typ: lk.Typ, Pid: lk.Pid},
