@@ -1,10 +1,15 @@
 version: '3'
 
 tasks:
-  gen-grpc:
+  gen:grpc:
     cmds:
-      - | 
+      - |
         protoc --go_out=. --go-grpc_out=. api/proto/*.proto
+
+  gen:mocks:
+    cmds:
+      - rm -rf mocks
+      - go run github.com/vektra/mockery/v2@v2.46.3
 
   test:
     cmds:
