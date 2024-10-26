@@ -79,6 +79,7 @@ func (f *GrpcFile) Flush() fuse.Status {
 	})
 	if err != nil {
 		log.Log.Error("error in call: Flush", zap.String("path", f.path), zap.Error(err))
+		return fuse.EIO
 	}
 	return fuse.Status(res.Status)
 }
@@ -91,6 +92,7 @@ func (f *GrpcFile) Fsync(flags int) fuse.Status {
 	})
 	if err != nil {
 		log.Log.Error("error in call: Fsync", zap.String("path", f.path), zap.Error(err))
+		return fuse.EIO
 	}
 	return fuse.Status(res.Status)
 }
@@ -105,6 +107,7 @@ func (f *GrpcFile) GetLk(owner uint64, lk *fuse.FileLock, flags uint32, out *fus
 	})
 	if err != nil {
 		log.Log.Error("error in call: GetLk", zap.String("path", f.path), zap.Error(err))
+		return fuse.EIO
 	}
 	out = &fuse.FileLock{Start: res.Lk.Start, End: res.Lk.End, Typ: res.Lk.Typ, Pid: res.Lk.Pid}
 	return fuse.Status(res.Status)
@@ -120,6 +123,7 @@ func (f *GrpcFile) SetLk(owner uint64, lk *fuse.FileLock, flags uint32) fuse.Sta
 	})
 	if err != nil {
 		log.Log.Error("error in call: SetLk", zap.String("path", f.path), zap.Error(err))
+		return fuse.EIO
 	}
 	return fuse.Status(res.Status)
 }
