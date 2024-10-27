@@ -4,6 +4,7 @@ import (
 	"gmountie/pkg/utils/log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"go.uber.org/zap"
 )
@@ -17,6 +18,8 @@ const (
 type TestVolume struct {
 	// Name is the name of the volume.
 	Name string
+	// GeneratedFiles
+	GeneratedFiles []string
 	// path is the path of the volume.
 	path string
 }
@@ -78,5 +81,16 @@ func (v *TestVolume) createRandomFiles() error {
 		randomFanout: true,
 	}
 	log.Log.Info("creating random files", zap.String("path", v.GetSrcPath()))
-	return g.WriteRandomFiles(v.GetSrcPath())
+	err := g.WriteRandomFiles(v.GetSrcPath())
+	if err != nil {
+		return err
+	}
+	// Remove the source path from the generated files.
+	v.GeneratedFiles = make([]string, 0, len(g.files))
+	for _, f := range g.files {
+		trimmed := strings.TrimPrefix(f, v.GetSrcPath())
+		trimmed = strings.TrimPrefix(trimmed, "/")
+		v.GeneratedFiles = append(v.GeneratedFiles, trimmed)
+	}
+	return nil
 }

@@ -8,12 +8,12 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type RpcFileServerTestSuite struct {
+type VolumeAPITestSuite struct {
 	suite.Suite
 	testAppCtx *utils.AppTestingContext
 }
 
-func (s *RpcFileServerTestSuite) SetupSuite() {
+func (s *VolumeAPITestSuite) SetupSuite() {
 	// Create a new auth service.
 	testAppCtx, err := utils.NewAppTestingContext(
 		utils.WithBasicAuth("test", "test"),
@@ -29,7 +29,7 @@ func (s *RpcFileServerTestSuite) SetupSuite() {
 	s.testAppCtx = testAppCtx
 }
 
-func (s *RpcFileServerTestSuite) TestListFiles() {
+func (s *VolumeAPITestSuite) TestListFiles() {
 	clientVolumes, err := s.testAppCtx.GetClientApp().VolumeService.GetVolumes(context.Background())
 	serverVolumes, err := s.testAppCtx.GetServerApp().VolumeService.List()
 
@@ -37,13 +37,13 @@ func (s *RpcFileServerTestSuite) TestListFiles() {
 	s.Assert().Equal(clientVolumes, serverVolumes)
 }
 
-func (s *RpcFileServerTestSuite) TearDownSuite() {
+func (s *VolumeAPITestSuite) TearDownSuite() {
 	err := s.testAppCtx.Close()
 	if err != nil {
 		s.T().Fatal(err)
 	}
 }
 
-func TestRpcFileServerTestSuite(t *testing.T) {
-	suite.Run(t, new(RpcFileServerTestSuite))
+func TestVolumeAPITestSuite(t *testing.T) {
+	suite.Run(t, new(VolumeAPITestSuite))
 }

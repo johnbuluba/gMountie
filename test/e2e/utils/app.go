@@ -120,6 +120,16 @@ func (c *AppTestingContext) GetClient() *grpcClient.Client {
 	return c.client
 }
 
+// GetVolumes returns the test volumes.
+func (c *AppTestingContext) GetVolumes() []*TestVolume {
+	return c.volumes
+}
+
+// MountVolume mounts the test volume.
+func (c *AppTestingContext) MountVolume(v *TestVolume) error {
+	return c.clientCtx.MounterService.Mount(v.Name, v.GetMountPath())
+}
+
 // Start starts the gRPC server.
 func (c *AppTestingContext) Start() error {
 	go func() {

@@ -1,7 +1,6 @@
 package service
 
 import (
-	"flag"
 	"gmountie/pkg/client/grpc"
 	"gmountie/pkg/client/io"
 	"gmountie/pkg/utils/log"
@@ -27,6 +26,11 @@ func (m *mount) Serve() {
 	log.Log.Info("mounting volume", zap.String("volume", m.volume), zap.String("path", m.path))
 	m.server.Serve()
 	m.server.Wait()
+}
+
+// Wait waits for the mount to finish
+func (m *mount) Wait() error {
+	return m.server.WaitMount()
 }
 
 // Stop stops the mount
@@ -93,12 +97,17 @@ func (m *MounterServiceImpl) Mount(volume, path string) error {
 			LookupKnownChildren: true,
 		})
 	server, err := fuse.NewServer(
-		connector.RawFS(), flag.Arg(0), &fuse.MountOptions{
+		connector.RawFS(),
+		path,
+		&fuse.MountOptions{
 			AllowOther:     true,
 			SingleThreaded: false,
 			Debug:          true,
+			Name:           volume,
+			FsName:         "gmountie",
 			Logger:         zap.NewStdLog(log.Log),
-		})
+		},
+	)
 	if err != nil {
 		log.Log.Sugar().Fatalf("mount fail: %v\n", err)
 	}
@@ -112,7 +121,7 @@ func (m *MounterServiceImpl) Mount(volume, path string) error {
 	go func() {
 		mount.Serve()
 	}()
-	return nil
+	return mount.Wait()
 }
 
 // Unmount unmounts a volume
