@@ -13,7 +13,15 @@ tasks:
 
   test:
     cmds:
-      - go test -p=1 ./... $TEST_EXTRA_ARGS
+      - go test  ./...
+
+  test:coverage:
+    cmds:
+      - go test -count=1 -coverpkg=./... -covermode=atomic -coverprofile coverage.out  ./...
+      - grep -v -E "gmountie/mocks|gmountie/test|gmountie/pkg/proto" coverage.out > coverage-filtered.out
+      - mv coverage-filtered.out coverage.out
+
+
 
   build:server:
     cmds:

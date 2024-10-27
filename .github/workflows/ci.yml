@@ -32,7 +32,16 @@ jobs:
           go install github.com/go-task/task/v3/cmd/task@latest
           go get github.com/boumenot/gocover-cobertura
       - name: Run tests
-        run: task test
+        run: |
+          task test:coverage
+
+      - name: check test coverage
+        uses: vladopajic/go-test-coverage@v2
+        with:
+          profile: coverage.out
+          local-prefix: github.com/johnbuluba/gMountie
+
+
       - uses: actions/cache/save@v4
         with:
           path: |
