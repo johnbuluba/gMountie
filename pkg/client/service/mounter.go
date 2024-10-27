@@ -100,7 +100,7 @@ func (m *MounterServiceImpl) Mount(volume, path string) error {
 		connector.RawFS(),
 		path,
 		&fuse.MountOptions{
-			AllowOther:     true,
+			AllowOther:     false,
 			SingleThreaded: false,
 			Debug:          true,
 			Name:           volume,
