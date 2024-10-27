@@ -20,14 +20,14 @@ type AuthService interface {
 // --------------------------- Factory ---------------------------
 
 // NewAuthServiceFromConfig creates a new AuthService from the config
-func NewAuthServiceFromConfig(cfg *config.Config) AuthService {
-	switch cfg.Auth.GetType() {
+func NewAuthServiceFromConfig(cfg config.AuthConfig) AuthService {
+	switch cfg.GetType() {
 	case config.AuthConfigTypeNone:
 		log.Log.Warn("no authentication is enabled")
 		return &NoneAuthService{}
 	case config.AuthConfigTypeBasic:
 		// Create users map
-		authConfig := cfg.Auth.(*config.BasicAuthConfig)
+		authConfig := cfg.(*config.BasicAuthConfig)
 		users := make(map[string]string)
 		for _, user := range authConfig.Users {
 			users[user.Username] = user.Password

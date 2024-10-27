@@ -7,20 +7,25 @@ import (
 	"gmountie/pkg/proto"
 )
 
-// VolumeService is a service that provides information about the volumes
-type VolumeService struct {
+// VolumeService is an interface that provides information about the volumes
+type VolumeService interface {
+	GetVolumes(ctx context.Context) ([]common.Volume, error)
+}
+
+// VolumeServiceImpl is a service that provides information about the volumes
+type VolumeServiceImpl struct {
 	client *grpc.Client
 }
 
-// NewVolumeService creates a new VolumeService
-func NewVolumeService(client *grpc.Client) *VolumeService {
-	return &VolumeService{
+// NewVolumeService creates a new VolumeServiceImpl
+func NewVolumeService(client *grpc.Client) VolumeService {
+	return &VolumeServiceImpl{
 		client: client,
 	}
 }
 
 // GetVolumes returns a list of volumes
-func (v *VolumeService) GetVolumes(ctx context.Context) ([]common.Volume, error) {
+func (v *VolumeServiceImpl) GetVolumes(ctx context.Context) ([]common.Volume, error) {
 	reply, err := v.client.Volume.List(ctx, &proto.VolumeListRequest{})
 	if err != nil {
 		return nil, err

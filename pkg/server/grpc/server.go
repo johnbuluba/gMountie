@@ -28,15 +28,31 @@ type Server struct {
 	services    []ServiceRegistrar
 	server      *grpc.Server
 	authService service.AuthService
+	listener    net.Listener
+}
+
+// ServerOption is a type that defines the ServerOption function.
+type ServerOption func(*Server)
+
+// WithListener sets the listener for the gRPC server.
+func WithListener(lis net.Listener) ServerOption {
+	return func(s *Server) {
+		s.listener = lis
+	}
 }
 
 // NewServer creates a new gRPC server.
-func NewServer(config *config.Config, authService service.AuthService, services []ServiceRegistrar) *Server {
-	return &Server{
+func NewServer(config *config.Config, authService service.AuthService, services []ServiceRegistrar, options ...ServerOption) *Server {
+	s := &Server{
 		config:      config,
 		services:    services,
 		authService: authService,
 	}
+
+	for _, opt := range options {
+		opt(s)
+	}
+	return s
 }
 
 // Serve starts the gRPC server.
@@ -49,8 +65,8 @@ func (s *Server) Serve() error {
 	// Create a new gRPC server.
 	s.server = grpc.NewServer(s.getOptions()...)
 	// Register the services.
-	for _, service := range s.services {
-		service.Register(s.server)
+	for _, svc := range s.services {
+		svc.Register(s.server)
 	}
 	// Add reflection.
 	reflection.Register(s.server)
@@ -77,6 +93,11 @@ func (s *Server) Stop(gracefully bool) {
 
 // createListener creates a new listener.
 func (s *Server) createListener() (net.Listener, error) {
+	// If the listener is already set, return it.
+	if s.listener != nil {
+		return s.listener, nil
+	}
+	// Create a new listener.
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%v", s.config.Server.Address, s.config.Server.Port))
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create listener")

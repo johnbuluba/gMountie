@@ -51,22 +51,32 @@ func (m *mount) Stop() error {
 	return nil
 }
 
-// MounterService is a service that mounts volumes
-type MounterService struct {
+// MounterService is an interface that mounts volumes
+type MounterService interface {
+	// Mount mounts a volume
+	Mount(volume, path string) error
+	// Unmount unmounts a volume
+	Unmount(volume string) error
+	// UnmountAll unmounts all volumes
+	UnmountAll() error
+}
+
+// MounterServiceImpl is a service that mounts volumes
+type MounterServiceImpl struct {
 	client *grpc.Client
 	mounts map[string]*mount
 }
 
-// NewMounterService creates a new MounterService
-func NewMounterService(client *grpc.Client) *MounterService {
-	return &MounterService{
+// NewMounterService creates a new MounterServiceImpl
+func NewMounterService(client *grpc.Client) MounterService {
+	return &MounterServiceImpl{
 		client: client,
 		mounts: make(map[string]*mount),
 	}
 }
 
 // Mount mounts a volume
-func (m *MounterService) Mount(volume, path string) error {
+func (m *MounterServiceImpl) Mount(volume, path string) error {
 	fs := io.NewLocalFileSystem(m.client, volume)
 	fs.SetDebug(true)
 	nodeFS := pathfs.NewPathNodeFs(fs, &pathfs.PathNodeFsOptions{
@@ -106,7 +116,7 @@ func (m *MounterService) Mount(volume, path string) error {
 }
 
 // Unmount unmounts a volume
-func (m *MounterService) Unmount(volume string) error {
+func (m *MounterServiceImpl) Unmount(volume string) error {
 	mount, ok := m.mounts[volume]
 	if !ok {
 		return nil
@@ -120,7 +130,7 @@ func (m *MounterService) Unmount(volume string) error {
 }
 
 // UnmountAll unmounts all volumes
-func (m *MounterService) UnmountAll() error {
+func (m *MounterServiceImpl) UnmountAll() error {
 	for volume := range m.mounts {
 		err := m.Unmount(volume)
 		if err != nil {

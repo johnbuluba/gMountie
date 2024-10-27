@@ -12,6 +12,7 @@ require (
 	github.com/puzpuzpuz/xsync/v3 v3.4.0
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.9.0
+	github.com/thanhpk/randstr v1.0.6
 	github.com/wailsapp/wails/v2 v2.9.1
 	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.67.1

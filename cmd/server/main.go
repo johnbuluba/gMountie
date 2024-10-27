@@ -2,10 +2,9 @@ package main
 
 import (
 	"flag"
+	"gmountie/pkg/server"
 	"gmountie/pkg/server/config"
-	"gmountie/pkg/server/controller"
 	"gmountie/pkg/server/grpc"
-	"gmountie/pkg/server/service"
 	"gmountie/pkg/utils/log"
 	"os"
 
@@ -32,15 +31,11 @@ func Start(cfgString string) error {
 		return err
 	}
 
-	volumeService := service.NewVolumeService(&cfg)
-	authService := service.NewAuthServiceFromConfig(&cfg)
-	server := grpc.NewServer(&cfg, authService, []grpc.ServiceRegistrar{
-		controller.NewGrpcServer(volumeService),
-		controller.NewRpcFileServer(volumeService),
-		controller.NewVolumeService(volumeService),
-	})
+	context := server.NewServerAppContext(&cfg)
 
-	if err = server.Serve(); err != nil {
+	s := grpc.NewServer(&cfg, context.AuthService, context.GetGrpcServices())
+
+	if err = s.Serve(); err != nil {
 		return errors.Wrap(err, "failed to start server")
 	}
 	return nil

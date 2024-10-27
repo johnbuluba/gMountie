@@ -9,32 +9,55 @@ import (
 
 // Client is a struct that holds the gRPC client
 type Client struct {
-	conn   *grpc.ClientConn
-	Fs     proto.RpcFsClient
-	File   proto.RpcFileClient
-	Volume proto.VolumeServiceClient
+	conn        *grpc.ClientConn
+	dialOptions []grpc.DialOption
+	Fs          proto.RpcFsClient
+	File        proto.RpcFileClient
+	Volume      proto.VolumeServiceClient
 }
 
-func NewClient(endpoint string) (*Client, error) {
+// -------------------- Client Options --------------------
+
+// ClientOption is a type that defines the ClientOption function
+type ClientOption func(*Client)
+
+// WithDialOptions sets the dial options for the gRPC client
+func WithDialOptions(dialOptions []grpc.DialOption) ClientOption {
+	return func(c *Client) {
+		// Append the dial options
+		c.dialOptions = append(c.dialOptions, dialOptions...)
+	}
+}
+
+// WithBasicAuth sets the basic authentication for the gRPC client
+func WithBasicAuth(username, password string) ClientOption {
+	return func(c *Client) {
+		c.dialOptions = append(c.dialOptions, grpc.WithPerRPCCredentials(NewBasicAuthCredentials(username, password)))
+	}
+}
+
+// ---------------------- Constructor ----------------------
+
+// NewClient creates a new gRPC client
+func NewClient(endpoint string, options ...ClientOption) (*Client, error) {
+	c := Client{}
+	for _, opt := range options {
+		opt(&c)
+	}
 	conn, err := grpc.NewClient(
 		endpoint,
-		grpc.WithPerRPCCredentials(NewBasicAuthCredentials("john", "123456")),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		//grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{})),
-		grpc.WithChainUnaryInterceptor(
-			getInterceptors()...,
-		),
+		c.getDialOptions()...,
 	)
 	if err != nil {
 		return nil, err
 	}
-	return &Client{
-		conn:   conn,
-		Fs:     proto.NewRpcFsClient(conn),
-		File:   proto.NewRpcFileClient(conn),
-		Volume: proto.NewVolumeServiceClient(conn),
-	}, nil
+	c.File = proto.NewRpcFileClient(conn)
+	c.Fs = proto.NewRpcFsClient(conn)
+	c.Volume = proto.NewVolumeServiceClient(conn)
+	return &c, nil
 }
+
+// ---------------------- Methods -----------------------
 
 // Connect connects to the gRPC server
 func (c *Client) Connect() {
@@ -44,4 +67,19 @@ func (c *Client) Connect() {
 // GetInterceptors returns the client interceptors
 func getInterceptors() []grpc.UnaryClientInterceptor {
 	return []grpc.UnaryClientInterceptor{}
+}
+
+// getDialOptions returns the dial options
+func (c *Client) getDialOptions() []grpc.DialOption {
+	opts := []grpc.DialOption{
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		//grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{})),
+		grpc.WithChainUnaryInterceptor(
+			getInterceptors()...,
+		),
+	}
+
+	// Append the dial options
+	opts = append(opts, c.dialOptions...)
+	return opts
 }
