@@ -13,6 +13,10 @@ import (
 	"go.uber.org/zap"
 )
 
+const (
+	FuseFSName = "gMountie"
+)
+
 type mount struct {
 	// Volume is the volume to mount
 	volume    string
@@ -103,8 +107,8 @@ func (m *MounterServiceImpl) Mount(volume, path string) error {
 			AllowOther:     false,
 			SingleThreaded: false,
 			Debug:          true,
-			Name:           volume,
-			FsName:         "gmountie",
+			Name:           FuseFSName,
+			FsName:         FuseFSName + ":/" + volume,
 			Logger:         zap.NewStdLog(log.Log),
 		},
 	)

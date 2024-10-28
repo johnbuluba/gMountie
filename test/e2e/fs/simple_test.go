@@ -15,7 +15,6 @@ type SimpleFSTestSuite struct {
 }
 
 func (s *SimpleFSTestSuite) SetupSuite() {
-	// Create a new auth service.
 	testAppCtx, err := utils.NewAppTestingContext(
 		utils.WithBasicAuth("test", "test"),
 		utils.WithRandomTestVolume(true),

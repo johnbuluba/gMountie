@@ -51,6 +51,7 @@ func NewClient(endpoint string, options ...ClientOption) (*Client, error) {
 	if err != nil {
 		return nil, err
 	}
+	c.conn = conn
 	c.File = proto.NewRpcFileClient(conn)
 	c.Fs = proto.NewRpcFsClient(conn)
 	c.Volume = proto.NewVolumeServiceClient(conn)

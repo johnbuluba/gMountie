@@ -9,8 +9,8 @@ package main
 
 import (
 	"flag"
+	"gmountie/pkg/client"
 	"gmountie/pkg/client/grpc"
-	"gmountie/pkg/client/service"
 	"gmountie/pkg/utils/log"
 	"os"
 	"os/signal"
@@ -23,33 +23,34 @@ func main() {
 		log.Log.Sugar().Fatalf("Usage:\n  hello MOUNTPOINT")
 	}
 
-	//client, err := grpc.NewClient("192.168.11.42:9449", "data")
-	//client, err := grpc.NewClient("gmountie.home.buluba.net:443", "data")
-	//client, err := grpc.NewClient("3.79.246.82:9449")
-	client, err := grpc.NewClient("localhost:9449")
+	//c, err := grpc.NewClient("192.168.11.42:9449", "data")
+	//c, err := grpc.NewClient("gmountie.home.buluba.net:443", "data")
+	//c, err := grpc.NewClient("18.194.209.199:9449", grpc.WithBasicAuth("john", "123456"))
+	c, err := grpc.NewClient("localhost:9449", grpc.WithBasicAuth("john", "123456"))
 	if err != nil {
 		log.Log.Sugar().Fatalf("failed to create client: %v", err)
 	}
-	client.Connect()
+	c.Connect()
 
-	mounter := service.NewMounterService(client)
+	appCtx := client.NewAppContext(c)
+
 	defer func() {
 		if r := recover(); r != nil {
 			log.Log.Sugar().Errorf("recovered: %v", err)
 		}
-		err := mounter.UnmountAll()
+		err := appCtx.MounterService.UnmountAll()
 		if err != nil {
 			log.Log.Sugar().Fatalf("failed to unmount: %v", err)
 			return
 		}
 	}()
-	err = mounter.Mount("test", flag.Arg(0))
+	err = appCtx.MounterService.Mount("test", flag.Arg(0))
 	if err != nil {
 		log.Log.Sugar().Fatalf("failed to mount: %v", err)
 		return
 	}
 
-	c := make(chan os.Signal)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-	<-c
+	ch := make(chan os.Signal)
+	signal.Notify(ch, os.Interrupt, syscall.SIGTERM)
+	<-ch
 }

@@ -13,6 +13,7 @@ require (
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.9.0
 	github.com/thanhpk/randstr v1.0.6
+	github.com/typomedia/diskspeed v0.1.0
 	github.com/wailsapp/wails/v2 v2.9.1
 	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.67.1
@@ -21,6 +22,7 @@ require (
 
 require (
 	github.com/bep/debounce v1.2.1 // indirect
+	github.com/cloudfoundry/gosigar v1.3.4 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
