@@ -40,14 +40,6 @@ jobs:
           git-branch: badges
 
 
-      - uses: actions/cache/save@v4
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-
-
   build:
     runs-on: ubuntu-latest
     steps:
