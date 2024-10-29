@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"fmt"
+	grpc2 "gmountie/pkg/common/grpc"
 	"gmountie/pkg/server/config"
 	"gmountie/pkg/server/service"
 	"gmountie/pkg/utils/log"
@@ -111,12 +112,12 @@ func (s *Server) getOptions() []grpc.ServerOption {
 	authInterceptor := NewAuthInterceptor(s.authService)
 	return []grpc.ServerOption{
 		grpc.ChainUnaryInterceptor(
+			authInterceptor.Unary(), // Must be first for the user to be logged.
 			unaryLog,
-			authInterceptor.Unary(),
 		),
 		grpc.ChainStreamInterceptor(
+			authInterceptor.Stream(), // Must be first for the user to be logged.
 			streamLog,
-			authInterceptor.Stream(),
 		),
 	}
 }
@@ -127,7 +128,7 @@ func (s *Server) getLoggingInterceptor() (grpc.UnaryServerInterceptor, grpc.Stre
 		logging.WithLogOnEvents(logging.StartCall, logging.FinishCall),
 		// Add any other option (check functions starting with logging.With).
 	}
-	unary := logging.UnaryServerInterceptor(InterceptorLogger(log.Log), opts...)
-	stream := logging.StreamServerInterceptor(InterceptorLogger(log.Log), opts...)
+	unary := logging.UnaryServerInterceptor(grpc2.InterceptorLogger(log.Log), opts...)
+	stream := logging.StreamServerInterceptor(grpc2.InterceptorLogger(log.Log), opts...)
 	return unary, stream
 }

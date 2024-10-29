@@ -11,10 +11,14 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+type UserDetails struct {
+	Username string
+}
+
 // AuthService is a service for authentication
 type AuthService interface {
 	// Authorize checks if the user is authorized
-	Authorize(ctx context.Context, method string) (bool, error)
+	Authorize(ctx context.Context, method string) (bool, *UserDetails, error)
 }
 
 // --------------------------- Factory ---------------------------
@@ -47,8 +51,8 @@ func NewAuthServiceFromConfig(cfg config.AuthConfig) AuthService {
 type NoneAuthService struct{}
 
 // Authorize always returns true
-func (a *NoneAuthService) Authorize(ctx context.Context, method string) (bool, error) {
-	return true, nil
+func (a *NoneAuthService) Authorize(ctx context.Context, method string) (bool, *UserDetails, error) {
+	return true, &UserDetails{Username: "anonymous"}, nil
 }
 
 // ----------- BasicAuthService -----------
@@ -64,26 +68,26 @@ func NewBasicAuthService(users map[string]string) *BasicAuthService {
 }
 
 // Authorize checks if the user is authorized
-func (a *BasicAuthService) Authorize(ctx context.Context, _ string) (bool, error) {
+func (a *BasicAuthService) Authorize(ctx context.Context, _ string) (bool, *UserDetails, error) {
 	// Get the user and password from the metadata
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return false, status.Errorf(codes.Internal, "metadata is not provided")
+		return false, nil, status.Errorf(codes.Internal, "metadata is not provided")
 	}
 
 	user := md.Get(common.MetadataAuthBasicUsername)
 	password := md.Get(common.MetadataAuthBasicPassword)
 	if len(user) == 0 || len(password) == 0 {
-		return false, status.Errorf(codes.Unauthenticated, "user or password is not provided")
+		return false, nil, status.Errorf(codes.Unauthenticated, "user or password is not provided")
 	}
 
 	// Check if the user exists
 	if pass, ok := a.users[user[0]]; ok {
 		// Check if the password is correct
 		if pass == password[0] {
-			return true, nil
+			userDetails := &UserDetails{Username: user[0]}
+			return true, userDetails, nil
 		}
 	}
-
-	return false, status.Errorf(codes.Unauthenticated, "invalid user or password")
+	return false, nil, status.Errorf(codes.Unauthenticated, "invalid user or password")
 }

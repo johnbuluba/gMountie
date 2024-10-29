@@ -1,8 +1,11 @@
 package grpc
 
 import (
+	grpc2 "gmountie/pkg/common/grpc"
 	"gmountie/pkg/proto"
+	"gmountie/pkg/utils/log"
 
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -67,7 +70,9 @@ func (c *Client) Connect() {
 
 // GetInterceptors returns the client interceptors
 func getInterceptors() []grpc.UnaryClientInterceptor {
-	return []grpc.UnaryClientInterceptor{}
+	return []grpc.UnaryClientInterceptor{
+		logging.UnaryClientInterceptor(grpc2.InterceptorLogger(log.Log)),
+	}
 }
 
 // getDialOptions returns the dial options

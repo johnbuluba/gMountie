@@ -107,9 +107,10 @@ func (m *MounterServiceImpl) Mount(volume, path string) error {
 			AllowOther:     false,
 			SingleThreaded: false,
 			Debug:          true,
+			EnableLocks:    true,
 			Name:           FuseFSName,
 			FsName:         FuseFSName + ":/" + volume,
-			Logger:         zap.NewStdLog(log.Log),
+			Logger:         zap.NewStdLog(log.Log.With(zap.String("volume", volume))),
 		},
 	)
 	if err != nil {

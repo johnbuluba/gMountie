@@ -4,6 +4,7 @@ import (
 	"context"
 	"gmountie/pkg/server/service"
 
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -22,11 +23,13 @@ func NewAuthInterceptor(authService service.AuthService) *AuthInterceptor {
 // Unary returns a UnaryServerInterceptor
 func (i *AuthInterceptor) Unary() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-		if ok, err := i.authService.Authorize(ctx, info.FullMethod); err != nil {
+		ok, user, err := i.authService.Authorize(ctx, info.FullMethod)
+		if err != nil {
 			return nil, err
 		} else if !ok {
 			return nil, status.Errorf(codes.PermissionDenied, "unauthorized")
 		}
+		ctx = logging.InjectLogField(ctx, "user", user.Username)
 		return handler(ctx, req)
 	}
 }
@@ -34,7 +37,8 @@ func (i *AuthInterceptor) Unary() grpc.UnaryServerInterceptor {
 // Stream returns a StreamServerInterceptor
 func (i *AuthInterceptor) Stream() grpc.StreamServerInterceptor {
 	return func(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
-		if ok, err := i.authService.Authorize(stream.Context(), info.FullMethod); err != nil {
+		ok, _, err := i.authService.Authorize(stream.Context(), info.FullMethod)
+		if err != nil {
 			return err
 		} else if !ok {
 			return status.Errorf(codes.PermissionDenied, "unauthorized")
