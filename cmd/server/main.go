@@ -33,7 +33,11 @@ func Start(cfgString string) error {
 
 	context := server.NewServerAppContext(&cfg)
 
-	s := grpc.NewServer(&cfg, context.AuthService, context.GetGrpcServices())
+	s := grpc.NewServer(
+		&cfg,
+		context.AuthService,
+		context.GetGrpcServices(),
+	)
 
 	if err = s.Serve(); err != nil {
 		return errors.Wrap(err, "failed to start server")

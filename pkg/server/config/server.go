@@ -17,15 +17,19 @@ type ServerConfig struct {
 	Address string `validate:"required,ip"`
 	// Port is the port that the server will listen on
 	Port uint `validate:"required"`
+	// Metrics
+	Metrics bool
 }
 
 // NewServerConfig creates a new ServerConfig with defaults
 func NewServerConfig(v *viper.Viper) *ServerConfig {
 	v.SetDefault("address", DefaultAddress)
 	v.SetDefault("port", DefaultPort)
+	v.SetDefault("metrics", true)
 
 	return &ServerConfig{
 		Address: v.GetString("address"),
 		Port:    v.GetUint("port"),
+		Metrics: v.GetBool("metrics"),
 	}
 }

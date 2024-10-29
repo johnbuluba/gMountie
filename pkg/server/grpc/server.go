@@ -4,14 +4,17 @@ import (
 	"fmt"
 	grpc2 "gmountie/pkg/common/grpc"
 	"gmountie/pkg/server/config"
+	_ "gmountie/pkg/server/grpc/snappy" // Installing the snappy encoding as an available compressor.
 	"gmountie/pkg/server/service"
 	"gmountie/pkg/utils/log"
 	"net"
+	"net/http"
 
-	_ "gmountie/pkg/server/grpc/snappy" // Installing the snappy encoding as an available compressor.
-
+	"github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"github.com/pkg/errors"
+	prometheus2 "github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	_ "google.golang.org/grpc/encoding/gzip" // Installing the gzip encoding as an available compressor.
@@ -25,11 +28,14 @@ type ServiceRegistrar interface {
 
 // Server is a struct that contains a gRPC server.
 type Server struct {
-	config      *config.Config
-	services    []ServiceRegistrar
-	server      *grpc.Server
-	authService service.AuthService
-	listener    net.Listener
+	config                  *config.Config
+	services                []ServiceRegistrar
+	server                  *grpc.Server
+	authService             service.AuthService
+	listener                net.Listener
+	extraUnaryInterceptors  []grpc.UnaryServerInterceptor
+	extraStreamInterceptors []grpc.StreamServerInterceptor
+	metricsServer           *prometheus.ServerMetrics
 }
 
 // ServerOption is a type that defines the ServerOption function.
@@ -63,6 +69,9 @@ func (s *Server) Serve() error {
 	if err != nil {
 		return err
 	}
+	// Initialize Prometheus metrics.
+	s.initMetricsServer()
+
 	// Create a new gRPC server.
 	s.server = grpc.NewServer(s.getOptions()...)
 	// Register the services.
@@ -76,6 +85,8 @@ func (s *Server) Serve() error {
 		log.Log.Info("gRPC service is enabled", zap.String("service", name))
 	}
 	log.Log.Info("gRPC server is running", zap.String("address", lis.Addr().String()))
+	// Start the metrics server.
+	s.startMetricsServer()
 	// Serve the gRPC server.
 	return s.server.Serve(lis)
 }
@@ -90,6 +101,11 @@ func (s *Server) Stop(gracefully bool) {
 	} else {
 		s.server.Stop()
 	}
+}
+
+// GetMetricsServer returns the metrics server.
+func (s *Server) GetMetricsServer() *prometheus.ServerMetrics {
+	return s.metricsServer
 }
 
 // createListener creates a new listener.
@@ -110,15 +126,26 @@ func (s *Server) createListener() (net.Listener, error) {
 func (s *Server) getOptions() []grpc.ServerOption {
 	unaryLog, streamLog := s.getLoggingInterceptor()
 	authInterceptor := NewAuthInterceptor(s.authService)
-	return []grpc.ServerOption{
-		grpc.ChainUnaryInterceptor(
+
+	unaryInterceptors := append(
+		[]grpc.UnaryServerInterceptor{
 			authInterceptor.Unary(), // Must be first for the user to be logged.
 			unaryLog,
-		),
-		grpc.ChainStreamInterceptor(
+		},
+		s.extraUnaryInterceptors...,
+	)
+
+	streamInterceptors := append(
+		[]grpc.StreamServerInterceptor{
 			authInterceptor.Stream(), // Must be first for the user to be logged.
 			streamLog,
-		),
+		},
+		s.extraStreamInterceptors...,
+	)
+
+	return []grpc.ServerOption{
+		grpc.ChainUnaryInterceptor(unaryInterceptors...),
+		grpc.ChainStreamInterceptor(streamInterceptors...),
 	}
 }
 
@@ -131,4 +158,38 @@ func (s *Server) getLoggingInterceptor() (grpc.UnaryServerInterceptor, grpc.Stre
 	unary := logging.UnaryServerInterceptor(grpc2.InterceptorLogger(log.Log), opts...)
 	stream := logging.StreamServerInterceptor(grpc2.InterceptorLogger(log.Log), opts...)
 	return unary, stream
+}
+
+// startMetricsServer starts the metrics server.
+func (s *Server) startMetricsServer() {
+	if s.metricsServer == nil {
+		log.Log.Debug("metrics server is disabled")
+		return
+	}
+	s.metricsServer.InitializeMetrics(s.server)
+	// Start the metrics server.
+	go func() {
+		http.Handle("/metrics", promhttp.Handler())
+		log.Log.Info("starting metrics server", zap.String("port", "9090"), zap.String("path", "/metrics"))
+		err := http.ListenAndServe(":9090", nil)
+		if err != nil {
+			log.Log.Fatal("failed to start metrics server", zap.Error(err))
+			return
+		}
+	}()
+}
+
+// initMetricsServer initializes the metrics server.
+func (s *Server) initMetricsServer() {
+	if s.config.Server == nil || !s.config.Server.Metrics {
+		return
+	}
+	// Add a metrics interceptor.
+	s.metricsServer = prometheus.NewServerMetrics()
+	// Register the metrics.
+	prometheus2.MustRegister(s.metricsServer)
+	// Add the metrics interceptor.
+	s.extraUnaryInterceptors = append(s.extraUnaryInterceptors, s.metricsServer.UnaryServerInterceptor())
+	s.extraStreamInterceptors = append(s.extraStreamInterceptors, s.metricsServer.StreamServerInterceptor())
+
 }
