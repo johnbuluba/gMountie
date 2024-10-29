@@ -207,6 +207,18 @@ func (r *RpcFileServerImpl) SetLkw(ctx context.Context, request *proto.SetLkwReq
 	}, nil
 }
 
+// Allocate allocates space for a file
+func (r *RpcFileServerImpl) Allocate(ctx context.Context, request *proto.AllocateRequest) (*proto.AllocateReply, error) {
+	file, err := r.getFile(request.Fd)
+	if err != nil {
+		return nil, err
+	}
+	s := file.file.Allocate(request.Off, request.Size, request.Mode)
+	return &proto.AllocateReply{
+		Status: int32(s),
+	}, nil
+}
+
 func (r *RpcFileServerImpl) addFile(fd uint64, path string, file nodefs.File) {
 	r.files.Store(fd, &fileEntry{
 		file: file,

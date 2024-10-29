@@ -32,6 +32,7 @@ type RpcFileClient interface {
 	GetLk(ctx context.Context, in *GetLkRequest, opts ...grpc.CallOption) (*GetLkReply, error)
 	SetLk(ctx context.Context, in *SetLkRequest, opts ...grpc.CallOption) (*SetLkReply, error)
 	SetLkw(ctx context.Context, in *SetLkwRequest, opts ...grpc.CallOption) (*SetLkwReply, error)
+	Allocate(ctx context.Context, in *AllocateRequest, opts ...grpc.CallOption) (*AllocateReply, error)
 }
 
 type rpcFileClient struct {
@@ -132,6 +133,15 @@ func (c *rpcFileClient) SetLkw(ctx context.Context, in *SetLkwRequest, opts ...g
 	return out, nil
 }
 
+func (c *rpcFileClient) Allocate(ctx context.Context, in *AllocateRequest, opts ...grpc.CallOption) (*AllocateReply, error) {
+	out := new(AllocateReply)
+	err := c.cc.Invoke(ctx, "/gmountie.RpcFile/Allocate", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RpcFileServer is the server API for RpcFile service.
 // All implementations must embed UnimplementedRpcFileServer
 // for forward compatibility
@@ -146,6 +156,7 @@ type RpcFileServer interface {
 	GetLk(context.Context, *GetLkRequest) (*GetLkReply, error)
 	SetLk(context.Context, *SetLkRequest) (*SetLkReply, error)
 	SetLkw(context.Context, *SetLkwRequest) (*SetLkwReply, error)
+	Allocate(context.Context, *AllocateRequest) (*AllocateReply, error)
 	mustEmbedUnimplementedRpcFileServer()
 }
 
@@ -182,6 +193,9 @@ func (UnimplementedRpcFileServer) SetLk(context.Context, *SetLkRequest) (*SetLkR
 }
 func (UnimplementedRpcFileServer) SetLkw(context.Context, *SetLkwRequest) (*SetLkwReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetLkw not implemented")
+}
+func (UnimplementedRpcFileServer) Allocate(context.Context, *AllocateRequest) (*AllocateReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Allocate not implemented")
 }
 func (UnimplementedRpcFileServer) mustEmbedUnimplementedRpcFileServer() {}
 
@@ -376,6 +390,24 @@ func _RpcFile_SetLkw_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RpcFile_Allocate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AllocateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RpcFileServer).Allocate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gmountie.RpcFile/Allocate",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RpcFileServer).Allocate(ctx, req.(*AllocateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // RpcFile_ServiceDesc is the grpc.ServiceDesc for RpcFile service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -422,6 +454,10 @@ var RpcFile_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetLkw",
 			Handler:    _RpcFile_SetLkw_Handler,
+		},
+		{
+			MethodName: "Allocate",
+			Handler:    _RpcFile_Allocate_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

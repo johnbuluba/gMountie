@@ -125,6 +125,20 @@ message SetLkwReply {
   int32 status = 1;
 }
 
+message AllocateRequest {
+  string volume = 1;
+  Caller caller = 2;
+  uint64 fd = 3;
+  string path = 4;
+  uint64 off = 5;
+  uint64 size = 6;
+  uint32 mode = 7;
+}
+
+message AllocateReply {
+  int32 status = 1;
+}
+
 service RpcFile {
   rpc Open (OpenRequest) returns (OpenReply);
   rpc Create (CreateRequest) returns (CreateReply);
@@ -136,4 +150,5 @@ service RpcFile {
   rpc GetLk (GetLkRequest) returns (GetLkReply);
   rpc SetLk (SetLkRequest) returns (SetLkReply);
   rpc SetLkw (SetLkwRequest) returns (SetLkwReply);
+  rpc Allocate (AllocateRequest) returns (AllocateReply);
 }

@@ -142,3 +142,19 @@ func (f *GrpcFile) SetLkw(owner uint64, lk *fuse.FileLock, flags uint32) fuse.St
 	}
 	return fuse.Status(res.Status)
 }
+
+// Allocate allocates space for a file
+func (f *GrpcFile) Allocate(off uint64, size uint64, mode uint32) fuse.Status {
+	res, err := f.fileClient.Allocate(context.Background(), &proto.AllocateRequest{
+		Volume: f.volume,
+		Fd:     f.fd,
+		Off:    off,
+		Size:   size,
+		Mode:   mode,
+	})
+	if err != nil {
+		log.Log.Error("error in call: Allocate", zap.String("path", f.path), zap.Error(err))
+		return fuse.EIO
+	}
+	return fuse.Status(res.Status)
+}
