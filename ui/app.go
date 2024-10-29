@@ -25,3 +25,8 @@ func (a *App) startup(ctx context.Context) {
 func (a *App) Greet(name string) string {
 	return fmt.Sprintf("Hello %s, It's show time!", name)
 }
+
+// Login is called when the user logs in
+func (a *App) Login(host, username, password string) (bool, error) {
+	return true, nil
+}
