@@ -13,7 +13,7 @@ tasks:
 
   test:
     cmds:
-      - go test  ./...
+      - go test -v ./...
 
   test:coverage:
     cmds:

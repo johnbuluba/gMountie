@@ -152,7 +152,7 @@ func (s *Server) getOptions() []grpc.ServerOption {
 // getLoggingInterceptor returns a new logging interceptor.
 func (s *Server) getLoggingInterceptor() (grpc.UnaryServerInterceptor, grpc.StreamServerInterceptor) {
 	opts := []logging.Option{
-		logging.WithLogOnEvents(logging.StartCall, logging.FinishCall),
+		logging.WithLogOnEvents(logging.FinishCall),
 		// Add any other option (check functions starting with logging.With).
 	}
 	unary := logging.UnaryServerInterceptor(grpc2.InterceptorLogger(log.Log), opts...)

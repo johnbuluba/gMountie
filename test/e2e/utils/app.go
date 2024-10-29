@@ -131,6 +131,11 @@ func (c *AppTestingContext) MountVolume(v *TestVolume) error {
 	return c.clientCtx.MounterService.Mount(v.Name, v.GetMountPath())
 }
 
+// UnmountVolume unmounts the test volume.
+func (c *AppTestingContext) UnmountVolume(v *TestVolume) error {
+	return c.clientCtx.MounterService.Unmount(v.Name)
+}
+
 // Start starts the gRPC server.
 func (c *AppTestingContext) Start() error {
 	go func() {
@@ -143,12 +148,17 @@ func (c *AppTestingContext) Start() error {
 
 // Close closes the gRPC server.
 func (c *AppTestingContext) Close() error {
-	c.server.Stop(false)
 	// Close the volumes
 	for _, v := range c.volumes {
-		if err := v.Close(); err != nil {
+		err := c.UnmountVolume(v)
+		if err != nil {
+			return err
+		}
+		if err = v.Close(); err != nil {
 			return err
 		}
 	}
+	// Close the server
+	c.server.Stop(true)
 	return nil
 }

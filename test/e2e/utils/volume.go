@@ -60,6 +60,11 @@ func (v *TestVolume) Close() error {
 	return os.RemoveAll(v.path)
 }
 
+// GetRootPath returns the root path of the volume.
+func (v *TestVolume) GetRootPath() string {
+	return v.path
+}
+
 // GetSrcPath returns the source path of the volume.
 func (v *TestVolume) GetSrcPath() string {
 	return filepath.Join(v.path, VolumeSrc)

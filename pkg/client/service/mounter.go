@@ -106,7 +106,7 @@ func (m *MounterServiceImpl) Mount(volume, path string) error {
 		&fuse.MountOptions{
 			AllowOther:     false,
 			SingleThreaded: false,
-			Debug:          true,
+			Debug:          false,
 			EnableLocks:    true,
 			Name:           FuseFSName,
 			FsName:         FuseFSName + ":/" + volume,
