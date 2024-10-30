@@ -20,7 +20,11 @@ auth:
     - username: john
       password: 123456
 volumes:
-- name: test
+- name: test1
+  path: /home/john/mnt/test
+- name: test2
+  path: /home/john/mnt/test
+- name: test3
   path: /home/john/mnt/test
 `
 

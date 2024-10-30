@@ -61,6 +61,10 @@ func (m *mount) Stop() error {
 
 // MounterService is an interface that mounts volumes
 type MounterService interface {
+	// IsVolumeMounted checks if a volume is mounted
+	IsVolumeMounted(volume string) bool
+	// GetMounts returns the mounts
+	GetMounts() []string
 	// Mount mounts a volume
 	Mount(volume, path string) error
 	// Unmount unmounts a volume
@@ -127,6 +131,21 @@ func (m *MounterServiceImpl) Mount(volume, path string) error {
 		mount.Serve()
 	}()
 	return mount.Wait()
+}
+
+// IsVolumeMounted checks if a volume is mounted
+func (m *MounterServiceImpl) IsVolumeMounted(volume string) bool {
+	_, ok := m.mounts[volume]
+	return ok
+}
+
+// GetMounts returns the mounts
+func (m *MounterServiceImpl) GetMounts() []string {
+	mounts := make([]string, 0)
+	for volume := range m.mounts {
+		mounts = append(mounts, volume)
+	}
+	return mounts
 }
 
 // Unmount unmounts a volume

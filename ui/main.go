@@ -2,6 +2,8 @@ package main
 
 import (
 	"embed"
+	"gmountie/pkg/utils/log"
+	"gmountie/ui/frontend"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -17,14 +19,19 @@ func main() {
 
 	// Create application with options
 	err := wails.Run(&options.App{
-		Title:  "ui",
-		Width:  1024,
-		Height: 768,
+		Title:         "ui",
+		Width:         1024,
+		Height:        768,
+		MinHeight:     584,
+		MinWidth:      512,
+		Logger:        frontend.NewLogger(log.Log.Named("ui")),
+		DisableResize: false,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
-		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 1},
+		BackgroundColour: &options.RGBA{R: 220, G: 244, B: 242, A: 1},
 		OnStartup:        app.startup,
+		OnShutdown:       app.shutdown,
 		Bind: []interface{}{
 			app,
 		},

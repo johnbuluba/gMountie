@@ -65,6 +65,11 @@ func (c *Client) Connect() {
 	c.conn.Connect()
 }
 
+// Close closes the gRPC client connection
+func (c *Client) Close() error {
+	return c.conn.Close()
+}
+
 // GetInterceptors returns the client interceptors
 func getInterceptors() []grpc.UnaryClientInterceptor {
 	return []grpc.UnaryClientInterceptor{
