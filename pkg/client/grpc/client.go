@@ -9,6 +9,7 @@ import (
 
 // Client is a struct that holds the gRPC client
 type Client struct {
+	endpoint    string
 	conn        *grpc.ClientConn
 	dialOptions []grpc.DialOption
 	Fs          proto.RpcFsClient
@@ -40,7 +41,7 @@ func WithBasicAuth(username, password string) ClientOption {
 
 // NewClient creates a new gRPC client
 func NewClient(endpoint string, options ...ClientOption) (*Client, error) {
-	c := Client{}
+	c := Client{endpoint: endpoint}
 	for _, opt := range options {
 		opt(&c)
 	}
@@ -59,6 +60,11 @@ func NewClient(endpoint string, options ...ClientOption) (*Client, error) {
 }
 
 // ---------------------- Methods -----------------------
+
+// GetEndpoint returns the gRPC client endpoint
+func (c *Client) GetEndpoint() string {
+	return c.endpoint
+}
 
 // Connect connects to the gRPC server
 func (c *Client) Connect() {

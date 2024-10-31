@@ -102,7 +102,7 @@ func NewAppTestingContext(options ...TestOptions) (*AppTestingContext, error) {
 		return nil, err
 	}
 	appCtx.client = c
-	appCtx.clientCtx = client.NewAppContext(c)
+	appCtx.clientCtx = client.NewAppContext(c, "")
 	return appCtx, nil
 }
 
@@ -127,13 +127,21 @@ func (c *AppTestingContext) GetVolumes() []*TestVolume {
 }
 
 // MountVolume mounts the test volume.
-func (c *AppTestingContext) MountVolume(v *TestVolume) error {
-	return c.clientCtx.MounterService.Mount(v.Name, v.GetMountPath())
+func (c *AppTestingContext) MountVolume(v *TestVolume) {
+	wait := make(chan struct{})
+	go func() {
+		err := c.clientCtx.SingleVolumeMounter.Mount(v.Name, v.GetMountPath())
+		if err != nil {
+			panic(err)
+		}
+		close(wait)
+	}()
+	<-wait
 }
 
 // UnmountVolume unmounts the test volume.
 func (c *AppTestingContext) UnmountVolume(v *TestVolume) error {
-	return c.clientCtx.MounterService.Unmount(v.Name)
+	return c.clientCtx.SingleVolumeMounter.Unmount(v.Name)
 }
 
 // Start starts the gRPC server.

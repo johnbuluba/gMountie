@@ -7,6 +7,8 @@ import (
 	"gmountie/pkg/client/grpc"
 	"gmountie/pkg/common"
 	"gmountie/pkg/utils/log"
+	"os"
+	"path/filepath"
 
 	"go.uber.org/zap"
 )
@@ -45,7 +47,16 @@ func (a *App) Login(endpoint, username, password string) (bool, error) {
 		return false, err
 	}
 	c.Connect()
-	a.appCtx = client.NewAppContext(c)
+	homePath, err := os.UserHomeDir()
+	if err != nil {
+		log.Log.Sugar().Fatalf("failed to get home directory: %v", err)
+	}
+	path := filepath.Join(homePath, "mnt", "gmountie")
+	a.appCtx = client.NewAppContext(c, path)
+	err = a.appCtx.MultiVolumeMounter.Start()
+	if err != nil {
+		return false, err
+	}
 	return true, nil
 }
 
@@ -75,16 +86,12 @@ func (a *App) IsMounted(volume common.Volume) (bool, error) {
 	if a.appCtx == nil {
 		return false, fmt.Errorf("not logged in")
 	}
-	return a.appCtx.MounterService.IsVolumeMounted(volume.Name), nil
+	return a.appCtx.MultiVolumeMounter.IsVolumeMounted(volume.Name), nil
 }
 
 // Mount mounts a volume
 func (a *App) Mount(volume common.Volume) error {
-	if a.appCtx == nil {
-		return fmt.Errorf("not logged in")
-	}
-	path := "/home/john/mnt/gmountie/" + volume.Name
-	return a.appCtx.MounterService.Mount(volume.Name, path)
+	return a.appCtx.MultiVolumeMounter.Mount(volume.Name)
 }
 
 // Unmount unmounts a volume
@@ -92,5 +99,5 @@ func (a *App) Unmount(volume common.Volume) error {
 	if a.appCtx == nil {
 		return fmt.Errorf("not logged in")
 	}
-	return a.appCtx.MounterService.Unmount(volume.Name)
+	return a.appCtx.MultiVolumeMounter.Unmount(volume.Name)
 }

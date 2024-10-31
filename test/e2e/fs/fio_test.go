@@ -40,7 +40,7 @@ func (s *FioTestSuite) SetupSuite() {
 	utils.Must0(s, CopyEmbedFiles(configs, scriptsPath))
 
 	// Mount the volume.
-	utils.Must0(s, s.testAppCtx.MountVolume(s.volume))
+	s.testAppCtx.MountVolume(s.volume)
 }
 
 func (s *FioTestSuite) TestFS() {

@@ -22,10 +22,11 @@ func (s *SimpleFSTestSuite) SetupSuite() {
 	if err != nil {
 		s.T().Fatal(err)
 	}
-	err = testAppCtx.Start()
-	if err != nil {
-		s.T().Fatal(err)
-	}
+	utils.Must0(s, testAppCtx.Start())
+	s.T().Cleanup(func() {
+		utils.Must0(s, testAppCtx.Close())
+	})
+
 	s.testAppCtx = testAppCtx
 }
 
@@ -36,17 +37,11 @@ func (s *SimpleFSTestSuite) TestFS() {
 	s.Require().NotNil(volume)
 	s.Require().GreaterOrEqual(len(volume.GeneratedFiles), 1)
 	// Mount the volume.
-	err := s.testAppCtx.MountVolume(volume)
-	s.Require().NoError(err)
-	s.T().Cleanup(func() {
-		// Unmount the volume.
-		err := s.testAppCtx.GetClientApp().MounterService.Unmount(volume.Name)
-		s.Require().NoError(err)
-	})
+	s.testAppCtx.MountVolume(volume)
 
 	// Test.
 	testFS := os.DirFS(volume.GetMountPath())
-	err = fstest.TestFS(testFS, volume.GeneratedFiles...)
+	err := fstest.TestFS(testFS, volume.GeneratedFiles...)
 
 	// Assert.
 	s.Require().NoError(err)

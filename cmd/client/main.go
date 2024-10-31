@@ -14,6 +14,7 @@ import (
 	"gmountie/pkg/utils/log"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 )
 
@@ -26,25 +27,37 @@ func main() {
 	//c, err := grpc.NewClient("192.168.11.42:9449", "data")
 	//c, err := grpc.NewClient("gmountie.home.buluba.net:443", "data")
 	//c, err := grpc.NewClient("18.194.209.199:9449", grpc.WithBasicAuth("john", "123456"))
-	c, err := grpc.NewClient("localhost:9449", grpc.WithBasicAuth("john", "123456"))
+	c, err := grpc.NewClient("127.0.0.1:9449", grpc.WithBasicAuth("john", "123456"))
 	if err != nil {
 		log.Log.Sugar().Fatalf("failed to create client: %v", err)
 	}
 	c.Connect()
 
-	appCtx := client.NewAppContext(c)
+	homePath, err := os.UserHomeDir()
+	if err != nil {
+		log.Log.Sugar().Fatalf("failed to get home directory: %v", err)
+	}
+	path := filepath.Join(homePath, "mnt", "gmountie")
+	appCtx := client.NewAppContext(c, path)
 
 	defer func() {
-		if r := recover(); r != nil {
-			log.Log.Sugar().Errorf("recovered: %v", err)
-		}
-		err := appCtx.MounterService.UnmountAll()
+		err = appCtx.Close()
 		if err != nil {
-			log.Log.Sugar().Fatalf("failed to unmount: %v", err)
+			log.Log.Sugar().Fatalf("failed to close the application: %v", err)
 			return
 		}
 	}()
-	err = appCtx.MounterService.Mount("test", flag.Arg(0))
+	err = appCtx.MultiVolumeMounter.Start()
+	if err != nil {
+		log.Log.Sugar().Fatalf("failed to start the multi volume mounter: %v", err)
+		return
+	}
+	err = appCtx.MultiVolumeMounter.Mount("test1")
+	if err != nil {
+		log.Log.Sugar().Fatalf("failed to mount: %v", err)
+		return
+	}
+	err = appCtx.MultiVolumeMounter.Mount("test2")
 	if err != nil {
 		log.Log.Sugar().Fatalf("failed to mount: %v", err)
 		return

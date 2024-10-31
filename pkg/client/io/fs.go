@@ -34,6 +34,13 @@ func (fs *LocalFileSystem) OnMount(nodeFs *pathfs.PathNodeFs) {
 
 // GetAttr returns the attributes of a file
 func (fs *LocalFileSystem) GetAttr(name string, context *fuse.Context) (*fuse.Attr, fuse.Status) {
+	if context == nil {
+		// When mounting the in another node through the connector, the context is nil
+		context = &fuse.Context{
+			Caller: fuse.Caller{Owner: fuse.Owner{Uid: 1000, Gid: 1000}, Pid: 1000},
+			Cancel: make(chan struct{}),
+		}
+	}
 	res, err := fs.client.Fs.GetAttr(context, &proto.GetAttrRequest{
 		Volume: fs.volume,
 		Caller: createCaller(context),
@@ -46,6 +53,7 @@ func (fs *LocalFileSystem) GetAttr(name string, context *fuse.Context) (*fuse.At
 	if res.GetAttributes() == nil {
 		return &fuse.Attr{}, fuse.Status(res.Status)
 	}
+	// We ignore Ino to force the client to generate its own ino numbers
 	a := &fuse.Attr{
 		Ino:    res.GetAttributes().Ino,
 		Size:   res.GetAttributes().Size,

@@ -17,7 +17,7 @@ jobs:
         with:
           packages: fio
           version: 1.0
-      - name: Setup Go 1.23
+      - name: Setup Go 1.23.2
         uses: actions/setup-go@v5
         with:
           go-version: 1.23.2
@@ -26,7 +26,6 @@ jobs:
           mkdir -p .cache
           mkdir -p ./reports
           go install github.com/go-task/task/v3/cmd/task@latest
-          go get github.com/boumenot/gocover-cobertura
       - name: Run tests
         run: |
           task test:coverage
