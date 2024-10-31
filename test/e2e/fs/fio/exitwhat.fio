@@ -18,8 +18,8 @@ rw=read
 numjobs=1
 ioengine=sync
 new_group=1
-thinktime=2000
-number_ios=1000
+thinktime=1000
+number_ios=500
 exit_what=stonewall
 
 [fast1]
@@ -36,8 +36,8 @@ rw=write
 numjobs=1
 ioengine=sync
 new_group=1
-thinktime=2000
-number_ios=1000
+thinktime=1000
+number_ios=500
 exit_what=all
 
 [fast2]
