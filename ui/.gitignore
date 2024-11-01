@@ -1,3 +1,6 @@
 build/bin
 node_modules
 frontend/build
+build/appimage/AppDir
+build/appimage/bin
+build/appimage/*.AppImage

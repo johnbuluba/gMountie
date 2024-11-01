@@ -33,6 +33,5 @@ func init() {
 		Log.Fatal("failed to create logger", zap.Error(err))
 	}
 	log.Default().SetOutput(logger.Writer())
-	log.Println("Logger initialized")
 	defer Log.Sync() // Flushes buffer, if any
 }

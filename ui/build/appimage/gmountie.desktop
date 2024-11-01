@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=gMountie
+Type=Application
+Icon=logo-256x256
+Exec=ui
+Comment=Update applications distributed in AppImage format
+Categories=Utility;

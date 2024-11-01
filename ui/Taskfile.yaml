@@ -1,7 +1,35 @@
 version: '3'
 
 tasks:
-
   run:
     cmds:
       - wails dev -tags webkit2_41
+
+  build:
+    cmds:
+      - wails build -tags webkit2_41
+
+  build:appimage:
+    deps:
+      - build
+      - download:linuxdeploy
+    dir: build/appimage
+    vars:
+      EXECUTABLE: ../bin/ui
+      ICON_FILE: ../../frontend/src/lib/assets/images/logo-256x256.png
+    cmds:
+      - rm -rf AppDir || true
+      - mkdir AppDir
+      - ./bin/linuxdeploy-x86_64.AppImage --appdir AppDir --icon-file {{.ICON_FILE}} -d gmountie.desktop  --executable {{.EXECUTABLE}}  --output appimage
+
+  download:linuxdeploy:
+    vars:
+      LINUXDEPLOY_APPIMAGE: https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+    generates:
+      - build/appimage/bin/linuxdeploy-x86_64.AppImage
+    cmds:
+      - mkdir -p build/appimage/bin
+      - curl -L -o build/appimage/bin/linuxdeploy-x86_64.AppImage {{.LINUXDEPLOY_APPIMAGE}}
+      - chmod +x build/appimage/bin/linuxdeploy-x86_64.AppImage
+    status:
+      - test -f build/appimage/bin/linuxdeploy-x86_64.AppImage
