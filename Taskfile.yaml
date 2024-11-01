@@ -5,6 +5,7 @@ includes:
   ui:
     dir: ./ui
     taskfile: ./ui/Taskfile.yaml
+    optional: true
 
 
 tasks:

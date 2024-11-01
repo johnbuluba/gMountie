@@ -20,16 +20,20 @@ tasks:
     cmds:
       - rm -rf AppDir || true
       - mkdir AppDir
-      - ./bin/linuxdeploy-x86_64.AppImage --appdir AppDir --icon-file {{.ICON_FILE}} -d gmountie.desktop  --executable {{.EXECUTABLE}}  --output appimage
+      - ./bin/linuxdeploy/AppRun --appdir AppDir --icon-file {{.ICON_FILE}} -d gmountie.desktop  --executable {{.EXECUTABLE}}  --output appimage
 
   download:linuxdeploy:
     vars:
       LINUXDEPLOY_APPIMAGE: https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
     generates:
-      - build/appimage/bin/linuxdeploy-x86_64.AppImage
+      - build/appimage/bin/linuxdeploy
     cmds:
       - mkdir -p build/appimage/bin
       - curl -L -o build/appimage/bin/linuxdeploy-x86_64.AppImage {{.LINUXDEPLOY_APPIMAGE}}
       - chmod +x build/appimage/bin/linuxdeploy-x86_64.AppImage
+      # We need to extract linuxdeploy for appimage to work in docker
+      - cd build/appimage/bin && ./linuxdeploy-x86_64.AppImage --appimage-extract
+      - mv build/appimage/bin/squashfs-root build/appimage/bin/linuxdeploy
+      - rm  build/appimage/bin/linuxdeploy-x86_64.AppImage
     status:
-      - test -f build/appimage/bin/linuxdeploy-x86_64.AppImage
+      - test -d build/appimage/bin/linuxdeploy
