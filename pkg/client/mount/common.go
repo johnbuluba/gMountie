@@ -38,7 +38,7 @@ func createMountOptions(endpoint, volume string) *fuse.MountOptions {
 		SingleThreaded: false,
 		MaxBackground:  50,
 		Debug:          debug,
-		EnableLocks:    false,
+		EnableLocks:    true,
 		DirectMount:    true,
 		Name:           FuseFSName,
 		FsName:         fmt.Sprintf("%s://%s/%s", FuseFSName, endpoint, volume),

@@ -9,7 +9,7 @@ type Logger struct {
 
 // NewLogger creates a new logger
 func NewLogger(logger *zap.Logger) *Logger {
-	return &Logger{logger: logger}
+	return &Logger{logger: logger.WithOptions(zap.AddCallerSkip(2))}
 }
 
 func (l *Logger) Print(message string) {

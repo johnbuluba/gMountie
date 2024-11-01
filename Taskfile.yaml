@@ -1,5 +1,12 @@
 version: '3'
 
+includes:
+
+  ui:
+    dir: ./ui
+    taskfile: ./ui/Taskfile.yaml
+
+
 tasks:
   gen:grpc:
     cmds:

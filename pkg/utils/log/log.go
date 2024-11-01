@@ -1,6 +1,8 @@
 package log
 
 import (
+	"log"
+
 	"go.uber.org/zap"
 )
 
@@ -11,7 +13,7 @@ func init() {
 
 	// Set logger to warn level for tests
 	zapConfig := zap.Config{
-		Level:       zap.NewAtomicLevelAt(zap.InfoLevel),
+		Level:       zap.NewAtomicLevelAt(zap.DebugLevel),
 		Development: true,
 		Sampling: &zap.SamplingConfig{
 			Initial:    100,
@@ -25,6 +27,12 @@ func init() {
 	Log = zap.Must(zapConfig.Build())
 	Log = Log.Named("gMountie")
 	zap.ReplaceGlobals(Log)
-
+	// Redirect standard library log to zap
+	logger, err := zap.NewStdLogAt(Log.Named("std"), zap.DebugLevel)
+	if err != nil {
+		Log.Fatal("failed to create logger", zap.Error(err))
+	}
+	log.Default().SetOutput(logger.Writer())
+	log.Println("Logger initialized")
 	defer Log.Sync() // Flushes buffer, if any
 }

@@ -16,15 +16,15 @@ import (
 	"go.uber.org/zap"
 )
 
-type MultiVolumeMounter interface {
+type VFSVolumeMounter interface {
 	Start() error
 	Mount(volumeName string) error
 	Mounter
 }
 
-// MultiVolumeMounterImpl is the interface for the root filesystem that supports multiple volumes
+// VFSVolumeMounterImpl is the interface for the root filesystem that supports multiple volumes
 // It mounts a MemFS then it attaches the volumes to the MemFS
-type MultiVolumeMounterImpl struct {
+type VFSVolumeMounterImpl struct {
 	// path is the path where the MemFS will be mounted
 	path string
 	// root is the root of the MemFS
@@ -41,9 +41,9 @@ type MultiVolumeMounterImpl struct {
 	initialized bool
 }
 
-// NewMultiVolumeMounter creates a new MultiVolumeMounterImpl
-func NewMultiVolumeMounter(client *grpc.Client, path string) MultiVolumeMounter {
-	m := &MultiVolumeMounterImpl{
+// NewMultiVolumeMounter creates a new VFSVolumeMounterImpl
+func NewMultiVolumeMounter(client *grpc.Client, path string) VFSVolumeMounter {
+	m := &VFSVolumeMounterImpl{
 		path:        path,
 		volumes:     xsync.NewMapOf[string, *pathfs.PathNodeFs](),
 		client:      client,
@@ -52,8 +52,8 @@ func NewMultiVolumeMounter(client *grpc.Client, path string) MultiVolumeMounter 
 	return m
 }
 
-// Start starts the MultiVolumeMounter
-func (m *MultiVolumeMounterImpl) Start() error {
+// Start starts the VFSVolumeMounter
+func (m *VFSVolumeMounterImpl) Start() error {
 	if !m.initialized {
 		if err := m.mountMemFS(m.path); err != nil {
 			return err
@@ -64,7 +64,7 @@ func (m *MultiVolumeMounterImpl) Start() error {
 }
 
 // Mount mounts the volume to the root filesystem
-func (m *MultiVolumeMounterImpl) Mount(volumeName string) error {
+func (m *VFSVolumeMounterImpl) Mount(volumeName string) error {
 	if !m.initialized {
 		return errors.New("mounter not started")
 	}
@@ -92,7 +92,7 @@ func (m *MultiVolumeMounterImpl) Mount(volumeName string) error {
 }
 
 // Unmount unmounts the volume from the root filesystem
-func (m *MultiVolumeMounterImpl) Unmount(volumeName string) error {
+func (m *VFSVolumeMounterImpl) Unmount(volumeName string) error {
 	// Check if the volume is already mounted
 	nFS, ok := m.volumes.Load(volumeName)
 	if !ok {
@@ -114,7 +114,7 @@ func (m *MultiVolumeMounterImpl) Unmount(volumeName string) error {
 }
 
 // UnmountAll unmounts all volumes from the root filesystem
-func (m *MultiVolumeMounterImpl) UnmountAll() error {
+func (m *VFSVolumeMounterImpl) UnmountAll() error {
 	var errs = make([]error, 0)
 	m.volumes.Range(func(key string, value *pathfs.PathNodeFs) bool {
 		if err := m.Unmount(key); err != nil {
@@ -132,7 +132,7 @@ func (m *MultiVolumeMounterImpl) UnmountAll() error {
 }
 
 // Close closes the root filesystem
-func (m *MultiVolumeMounterImpl) Close() error {
+func (m *VFSVolumeMounterImpl) Close() error {
 	if m.server == nil {
 		return nil
 	}
@@ -157,7 +157,7 @@ func (m *MultiVolumeMounterImpl) Close() error {
 }
 
 // mountMemFS mounts a MemFS to the path
-func (m *MultiVolumeMounterImpl) mountMemFS(path string) error {
+func (m *VFSVolumeMounterImpl) mountMemFS(path string) error {
 	// create a new MemFS
 	m.root = nodefs.NewDefaultNode()
 	// create a new FileSystemConnector
@@ -179,7 +179,7 @@ func (m *MultiVolumeMounterImpl) mountMemFS(path string) error {
 	return nil
 }
 
-func (m *MultiVolumeMounterImpl) IsVolumeMounted(volume string) bool {
+func (m *VFSVolumeMounterImpl) IsVolumeMounted(volume string) bool {
 	_, ok := m.volumes.Load(volume)
 	return ok
 }

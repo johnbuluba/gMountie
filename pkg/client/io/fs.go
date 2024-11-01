@@ -29,7 +29,7 @@ func NewLocalFileSystem(client *grpc.Client, volume string) pathfs.FileSystem {
 
 // OnMount is called after the file system is mounted
 func (fs *LocalFileSystem) OnMount(nodeFs *pathfs.PathNodeFs) {
-	log.Log.Info("File system is mounted", zap.String("volume", fs.volume))
+	log.Log.Debug("file system is mounted", zap.String("volume", fs.volume))
 }
 
 // GetAttr returns the attributes of a file

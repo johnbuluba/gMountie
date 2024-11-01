@@ -13,7 +13,7 @@ type AppContext struct {
 	client              *grpc.Client
 	VolumeService       service.VolumeService
 	SingleVolumeMounter mount.SingleVolumeMounter
-	MultiVolumeMounter  mount.MultiVolumeMounter
+	MultiVolumeMounter  mount.VFSVolumeMounter
 }
 
 // NewAppContext creates a new AppContext.
