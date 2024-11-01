@@ -3,14 +3,13 @@ package main
 import (
 	"embed"
 	"gmountie/pkg/utils/log"
-	"gmountie/ui/frontend"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 )
 
-//go:embed all:frontend/dist
+//go:embed all:frontend/build
 var assets embed.FS
 
 func main() {
@@ -24,7 +23,7 @@ func main() {
 		Height:        768,
 		MinHeight:     584,
 		MinWidth:      512,
-		Logger:        frontend.NewLogger(log.Log.Named("ui")),
+		Logger:        NewLogger(log.Log.Named("ui")),
 		DisableResize: false,
 		AssetServer: &assetserver.Options{
 			Assets: assets,

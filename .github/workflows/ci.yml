@@ -17,10 +17,10 @@ jobs:
         with:
           packages: fio
           version: 1.0
-      - name: Setup Go 1.23.2
+      - name: Setup Go 1.23.0
         uses: actions/setup-go@v5
         with:
-          go-version: 1.23.2
+          go-version: 1.23.0
       - name: Install dependencies
         run: |
           mkdir -p .cache

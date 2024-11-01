@@ -9,5 +9,6 @@
   "author": {
     "name": "Ioannis Bouloumpasis",
     "email": "ioannis.bouloumpasis@hpe.com"
-  }
+  },
+  "wailsjsdir": "./frontend/src/lib"
 }

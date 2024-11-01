@@ -1,6 +1,6 @@
 module gmountie
 
-go 1.23.2
+go 1.23.0
 
 require (
 	github.com/avast/retry-go/v4 v4.6.0
