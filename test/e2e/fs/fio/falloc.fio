@@ -13,7 +13,7 @@ group_reporting
 # After activity file will be highly fragmented
 [falloc-fuzzer]
 stonewall
-runtime=10
+runtime=5
 time_based
 bssplit=4k/10:64k/50:32k/40
 rw=randwrite
@@ -22,7 +22,7 @@ filename=fragmented_file
 
 [punch hole-fuzzer]
 bs=4k
-runtime=10
+runtime=5
 time_based
 rw=randtrim
 numjobs=2

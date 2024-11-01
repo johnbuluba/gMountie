@@ -14,7 +14,7 @@ import (
 
 const (
 	FuseFSName = "gMountie"
-	debug      = true
+	debug      = false
 )
 
 // Mounter is the interface for the mounter
@@ -36,8 +36,10 @@ func createMountOptions(endpoint, volume string) *fuse.MountOptions {
 	return &fuse.MountOptions{
 		AllowOther:     false,
 		SingleThreaded: false,
+		MaxBackground:  50,
 		Debug:          debug,
-		EnableLocks:    true,
+		EnableLocks:    false,
+		DirectMount:    true,
 		Name:           FuseFSName,
 		FsName:         fmt.Sprintf("%s://%s/%s", FuseFSName, endpoint, volume),
 		Logger:         zap.NewStdLog(log.Log.Named("fuse")),

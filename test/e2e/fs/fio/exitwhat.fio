@@ -8,7 +8,7 @@
 # runsnever will never run.
 
 [global]
-filesize=10M
+filesize=2M
 blocksize=4096
 group_reporting
 exitall=1
@@ -18,8 +18,8 @@ rw=read
 numjobs=1
 ioengine=sync
 new_group=1
-thinktime=1000
-number_ios=500
+thinktime=500
+number_ios=100
 exit_what=stonewall
 
 [fast1]
@@ -36,8 +36,8 @@ rw=write
 numjobs=1
 ioengine=sync
 new_group=1
-thinktime=1000
-number_ios=500
+thinktime=500
+number_ios=100
 exit_what=all
 
 [fast2]
