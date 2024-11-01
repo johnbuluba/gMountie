@@ -29,15 +29,15 @@ func (s *FioTestSuite) SetupSuite() {
 		utils.WithBasicAuth("test", "test"),
 		utils.WithRandomTestVolume(false),
 	)
-	utils.Must0(s, err)
-	utils.Must0(s, testAppCtx.Start())
+	utils.Must0(s.T(), err)
+	utils.Must0(s.T(), testAppCtx.Start())
 
 	s.testAppCtx = testAppCtx
 	// Copy the fio config files to the volume.
 	s.volume = s.testAppCtx.GetVolumes()[0]
 	scriptsPath := filepath.Join(s.volume.GetRootPath(), "scripts")
-	utils.Must0(s, os.Mkdir(scriptsPath, 0o700))
-	utils.Must0(s, CopyEmbedFiles(configs, scriptsPath))
+	utils.Must0(s.T(), os.Mkdir(scriptsPath, 0o700))
+	utils.Must0(s.T(), CopyEmbedFiles(configs, scriptsPath))
 
 	// Mount the volume.
 	s.testAppCtx.MountVolume(s.volume)

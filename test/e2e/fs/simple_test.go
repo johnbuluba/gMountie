@@ -22,9 +22,9 @@ func (s *SimpleFSTestSuite) SetupSuite() {
 	if err != nil {
 		s.T().Fatal(err)
 	}
-	utils.Must0(s, testAppCtx.Start())
+	utils.Must0(s.T(), testAppCtx.Start())
 	s.T().Cleanup(func() {
-		utils.Must0(s, testAppCtx.Close())
+		utils.Must0(s.T(), testAppCtx.Close())
 	})
 
 	s.testAppCtx = testAppCtx

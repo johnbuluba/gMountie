@@ -15,7 +15,7 @@ func setup(b *testing.B) (*utils.AppTestingContext, *utils.TestVolume) {
 	// Create a new app testing context.
 	testAppCtx, err := utils.NewAppTestingContext(
 		utils.WithBasicAuth("test", "test"),
-		utils.WithRandomTestVolume(true),
+		utils.WithRandomTestVolume(false),
 	)
 	require.NoError(b, err)
 	// Start the app testing context.
@@ -29,10 +29,7 @@ func setup(b *testing.B) (*utils.AppTestingContext, *utils.TestVolume) {
 	// Cleanup.
 	b.Cleanup(func() {
 		// Unmount the volume.
-		err := testAppCtx.GetClientApp().SingleVolumeMounter.Unmount(volume.Name)
-		require.NoError(b, err)
-		err = testAppCtx.Close()
-		require.NoError(b, err)
+		utils.Must0(b, testAppCtx.Close())
 	})
 	return testAppCtx, volume
 }
