@@ -12,8 +12,8 @@ before:
   hooks:
     # You may remove this if you don't use go modules.
     - go mod tidy
-    # you may remove this if you don't need go generate
-    - go generate ./...
+    - task ui:build:appimage BUILD_VERSION={{.Version}} BUILD_COMMIT={{.Commit}} BUILD_DATE={{.Date}}
+
 
 builds:
   - env:
@@ -23,10 +23,20 @@ builds:
     id: gmountie-server
     main: cmd/server/main.go
     binary: gmountie-server
+    ldflags:
+    - -s -w -X gmountie/pkg.version={{.Version}} -X gmountie/pkg.commit={{.Commit}} -X gmountie/pkg.date={{.Date}}
+    goarch:
+      - amd64
+      - arm64
   - env:
     - CGO_ENABLED=0
     goos:
     - linux
+    ldflags:
+      - -s -w -X gmountie/pkg.version={{.Version}} -X gmountie/pkg.commit={{.Commit}} -X gmountie/pkg.date={{.Date}}
+    goarch:
+      - amd64
+      - arm64
     id: gmountie-client
     main: cmd/client/main.go
     binary: gmountie-client

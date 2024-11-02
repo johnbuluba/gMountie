@@ -1,6 +1,7 @@
 build/bin
 node_modules
 frontend/build
+frontend/build/.gitkeep
 build/appimage/AppDir
 build/appimage/bin
 build/appimage/*.AppImage

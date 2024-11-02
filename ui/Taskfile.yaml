@@ -6,8 +6,12 @@ tasks:
       - wails dev -tags webkit2_41
 
   build:
+    vars:
+      BUILD_VERSION: '{{ .BUILD_VERSION | default "unknown" }}'
+      BUILD_COMMIT: '{{.BUILD_COMMIT | default "unknown"}}'
+      BUILD_DATE:  '{{.BUILD_DATE | default "unknown"}}'
     cmds:
-      - wails build -tags webkit2_41
+      - wails build -clean -tags webkit2_41 -ldflags "-X gmountie/pkg.version={{.BUILD_VERSION}} -X gmountie/pkg.commit={{.BUILD_COMMIT}} -X gmountie/pkg.date={{.BUILD_DATE}}"
 
   build:appimage:
     deps:
@@ -23,6 +27,7 @@ tasks:
       - ./bin/linuxdeploy/AppRun --appdir AppDir --icon-file {{.ICON_FILE}} -d gmountie.desktop  --executable {{.EXECUTABLE}}  --output appimage
 
   download:linuxdeploy:
+    internal: true
     vars:
       LINUXDEPLOY_APPIMAGE: https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
     generates:
