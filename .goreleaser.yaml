@@ -46,6 +46,12 @@ archives:
       - goos: windows
         format: zip
 
+release:
+  draft: true
+  extra_files:
+    - glob: ./ui/build/appimage/gMountie-x86_64
+      name_template: 'gMountieUI_{{ .Version }}-x86_64.AppImage'
+
 changelog:
   sort: asc
   filters:
