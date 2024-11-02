@@ -42,7 +42,7 @@ builds:
     binary: gmountie-client
 
 archives:
-  - format: tar.gz
+  - format: zip
     # this name template makes the OS and Arch compatible with the results of `uname`.
     name_template: >-
       {{ .ProjectName }}_
@@ -58,6 +58,8 @@ archives:
 
 release:
   draft: true
+  # prerelease: auto
+  prerelease: true
   extra_files:
     - glob: ./ui/build/appimage/gMountie-x86_64.AppImage
       name_template: 'gMountieUI_{{ .Version }}-x86_64.AppImage'
