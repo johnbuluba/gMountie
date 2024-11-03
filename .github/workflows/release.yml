@@ -12,12 +12,14 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+      with:
+        fetch-tags: true
 
     - name: Cache apt packages
       uses: awalsh128/cache-apt-pkgs-action@latest
       with:
-        packages: libwebkit2gtk-4.1-dev curl
-        version: 1.0
+        packages: fio libwebkit2gtk-4.1-dev gtk+-3.0
+        version: 2.0
 
     - name: Setup Go 1.23.0
       uses: actions/setup-go@v5
@@ -35,7 +37,7 @@ jobs:
     - name: Install dependencies
       run: |
         go install github.com/go-task/task/v3/cmd/task
-        go install github.com/wailsapp/wails/v3/cmd/wails
+        go install -v github.com/wailsapp/wails/v3/cmd/wails3@latest
 
     - name: Run GoReleaser
       uses: goreleaser/goreleaser-action@v6
