@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {Login} from '$lib/wailsjs/go/main/App'
+    import {Login} from 'bindings/gmountie/ui3/app'
     import { goto } from '$app/navigation'
 
     let endpoint: string = "127.0.0.1:9449"

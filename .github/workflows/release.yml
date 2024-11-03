@@ -32,7 +32,7 @@ jobs:
     - name: Install dependencies
       run: |
         go install github.com/go-task/task/v3/cmd/task
-        go install github.com/wailsapp/wails/v2/cmd/wails
+        go install github.com/wailsapp/wails/v3/cmd/wails
 
     - name: Run GoReleaser
       uses: goreleaser/goreleaser-action@v6

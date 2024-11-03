@@ -1,8 +1,8 @@
 <script lang="ts">
-    import {common} from "$lib/wailsjs/go/models";
-    import {IsMounted, Mount, Unmount} from '$lib/wailsjs/go/main/App'
+    import {Volume} from "bindings/gmountie/pkg/common";
+    import {IsMounted, Mount, Unmount} from 'bindings/gmountie/ui3/app'
 
-    export let volume: common.Volume;
+    export let volume: Volume;
 
     let icon = "fa-play";
     let disabled = true;
@@ -39,7 +39,7 @@
     }
 </script>
 
-<button type="button" class="btn-icon variant-filled" disabled:={disabled} on:click={mountUnmount}>
+<button type="button" class="btn-icon variant-filled" aria-label="status" disabled={disabled} on:click={mountUnmount}>
     <i class="fa-solid {icon}"></i>
 </button>
 

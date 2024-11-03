@@ -1,8 +1,8 @@
 <script lang="ts">
     import MountButton from "./button-mount.svelte";
-    import {common} from "$lib/wailsjs/go/models";
+    import {Volume} from "bindings/gmountie/pkg/common";
 
-    export let volumes: common.Volume[];
+    export let volumes: Volume[];
 
 </script>
 

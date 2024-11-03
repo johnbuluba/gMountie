@@ -12,7 +12,7 @@ before:
   hooks:
     # You may remove this if you don't use go modules.
     - go mod tidy
-    - task ui:build:appimage BUILD_VERSION={{.Version}} BUILD_COMMIT={{.Commit}} BUILD_DATE={{.Date}}
+    - task ui:package:linux BUILD_VERSION={{.Version}} BUILD_COMMIT={{.Commit}} BUILD_DATE={{.Date}}
 
 
 builds:

@@ -4,7 +4,7 @@ includes:
 
   ui:
     dir: ./ui
-    taskfile: ./ui/Taskfile.yaml
+    taskfile: ./ui/Taskfile.yml
     optional: true
 
 

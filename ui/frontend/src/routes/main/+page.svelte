@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {GetVolumes, Logout} from '$lib/wailsjs/go/main/App'
+    import {GetVolumes, Logout} from 'bindings/gmountie/ui3/app'
     import VolumesTable from "./table-volumes.svelte";
     import logo from "$lib/assets/images/logo-full-cropped.png";
     import {Avatar} from '@skeletonlabs/skeleton';

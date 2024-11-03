@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/wailsapp/wails/v3/pkg/application"
 	"go.uber.org/zap"
 )
 
@@ -24,20 +25,21 @@ func NewApp() *App {
 	return &App{}
 }
 
-// startup is called when the app starts. The context is saved
-// so we can call the runtime methods
-func (a *App) startup(ctx context.Context) {
+func (a *App) OnStartup(ctx context.Context, options application.ServiceOptions) error {
+	// Any initialization code here
 	a.ctx = ctx
+	return nil
 }
 
-// shutdown is called when the app is shutting down
-func (a *App) shutdown(ctx context.Context) {
+func (a *App) OnShutdown() error {
 	if a.appCtx != nil {
 		err := a.appCtx.Close()
 		if err != nil {
 			log.Log.Error("error closing app context", zap.Error(err))
+			return err
 		}
 	}
+	return nil
 }
 
 // Login is called when the user logs in
