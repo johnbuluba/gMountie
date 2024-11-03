@@ -22,16 +22,15 @@ jobs:
         packages: fio libwebkit2gtk-4.1-dev gtk+-3.0
         version: 2.0
 
-    - name: Setup Go 1.23.0
+    - name: Setup Go
       uses: actions/setup-go@v5
       with:
-        go-version: 1.23.0
+        go-version-file: 'go.mod'
 
     - name: Use Node.js '20.x'
       uses: actions/setup-node@v4
       with:
         node-version: '20.x'
-        node-version-file: "ui/frontend/package.json"
         cache: npm
         cache-dependency-path: "ui/frontend/package-lock.json"
 

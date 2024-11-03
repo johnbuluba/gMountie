@@ -18,10 +18,10 @@ jobs:
         with:
           packages: fio libwebkit2gtk-4.1-dev gtk+-3.0
           version: 2.0
-      - name: Setup Go 1.23.0
+      - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: 1.23.0
+          go-version-file: 'go.mod'
       - name: Install dependencies
         run: |
           mkdir -p .cache
