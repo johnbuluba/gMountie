@@ -3,7 +3,7 @@
   <p><i>Simplifying remote filesystem mounting with FUSE and gRPC</i></p>
 </div>
 
-![coverage](https://raw.githubusercontent.com/johnbuluba/gMountie/badges/.badges/main/coverage.svg)
+![coverage](https://raw.githubusercontent.com/johnbuluba/gMountie/badges/.badges/master/coverage.svg)
 
 ## Overview
 
