@@ -4,6 +4,13 @@ on:
   push:
     tags:
       - '*'
+  workflow_dispatch:
+    inputs:
+      snapshot:
+        description: 'Create a snapshot release'
+        required: true
+        default: true
+        type: boolean
 
 jobs:
 
@@ -39,11 +46,14 @@ jobs:
         go install github.com/go-task/task/v3/cmd/task
         go install -v github.com/wailsapp/wails/v3/cmd/wails3@latest
 
+    - if: ${{  github.event.inputs.snapshot == 'true' }}
+      run: echo "flags=--snapshot" >> $GITHUB_ENV
+
     - name: Run GoReleaser
       uses: goreleaser/goreleaser-action@v6
       with:
         version: latest
-        args: release --clean
+        args: release --clean ${{ env.flags }}
       env:
         GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
