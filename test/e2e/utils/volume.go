@@ -10,8 +10,9 @@ import (
 )
 
 const (
-	VolumeSrc   = "src"
-	VolumeMount = "mount"
+	VolumeSrc      = "src"
+	VolumeMount    = "mount"
+	RandomFilesDir = "random"
 )
 
 // TestVolume is a struct that holds the test volume.
@@ -75,6 +76,11 @@ func (v *TestVolume) GetMountPath() string {
 	return filepath.Join(v.path, VolumeMount)
 }
 
+// GetRandomFilesPath returns the random files path of the volume.
+func (v *TestVolume) GetRandomFilesPath() string {
+	return filepath.Join(v.GetSrcPath(), RandomFilesDir)
+}
+
 // createRandomFiles creates random files in the source path.
 func (v *TestVolume) createRandomFiles() error {
 	g := &RandomFileGenerator{
@@ -86,7 +92,12 @@ func (v *TestVolume) createRandomFiles() error {
 		randomFanout: true,
 	}
 	log.Log.Info("creating random files", zap.String("path", v.GetSrcPath()))
-	err := g.WriteRandomFiles(v.GetSrcPath())
+	// Create random directory.
+	err := os.Mkdir(v.GetRandomFilesPath(), 0o700)
+	if err != nil {
+		return err
+	}
+	err = g.WriteRandomFiles(v.GetRandomFilesPath())
 	if err != nil {
 		return err
 	}

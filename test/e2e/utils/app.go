@@ -8,6 +8,7 @@ import (
 	"gmountie/pkg/server/config"
 	grpcServer "gmountie/pkg/server/grpc"
 	"net"
+	"time"
 
 	"github.com/thanhpk/randstr"
 	"google.golang.org/grpc"
@@ -151,6 +152,8 @@ func (c *AppTestingContext) Start() error {
 			panic(err)
 		}
 	}()
+	// Wait for the server to start
+	time.Sleep(1 * time.Second)
 	return nil
 }
 

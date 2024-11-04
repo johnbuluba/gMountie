@@ -155,10 +155,13 @@ func (s *Server) getLoggingInterceptor() (grpc.UnaryServerInterceptor, grpc.Stre
 	opts := []logging.Option{
 		logging.WithLogOnEvents(logging.FinishCall),
 		logging.WithLevels(func(code codes.Code) logging.Level {
-			if code == codes.OK {
+			switch code {
+			case codes.OK:
+				// Because we are getting a lot of OKs, we are going to log them as debug.
 				return logging.LevelDebug
+			default:
+				return logging.DefaultServerCodeToLevel(code)
 			}
-			return logging.DefaultServerCodeToLevel(code)
 		}),
 		// Add any other option (check functions starting with logging.With).
 	}
