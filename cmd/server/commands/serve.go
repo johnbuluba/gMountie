@@ -59,7 +59,7 @@ var serveCmd = &cobra.Command{
 		}
 
 		// Start server
-		return serverStart(&cfg)
+		return serverStart(cfg)
 	},
 }
 

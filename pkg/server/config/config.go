@@ -1,8 +1,8 @@
 package config
 
 import (
-	"bytes"
 	"fmt"
+	"gmountie/pkg/common/config"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/spf13/viper"
@@ -24,16 +24,11 @@ type Config struct {
 	Volumes []*VolumeConfig `validate:"required,dive"`
 }
 
-func LoadConfigFromString(cfg string) (Config, error) {
-	viper.SetConfigType("yaml")
-	err := viper.ReadConfig(bytes.NewBufferString(cfg))
-	if err != nil {
-		return Config{}, err
-	}
-	return ParseConfig(viper.GetViper())
+func LoadConfigFromString(cfg string) (*Config, error) {
+	return config.LoadConfigFromString(cfg, ParseConfig)
 }
 
-func ParseConfig(v *viper.Viper) (Config, error) {
+func ParseConfig(v *viper.Viper) (*Config, error) {
 	var result Config
 	// Enable environment variables.
 	v.SetEnvPrefix(EnvironmentPrefix)
@@ -46,7 +41,7 @@ func ParseConfig(v *viper.Viper) (Config, error) {
 	// Parse the auth configuration.
 	auth, err := NewFromConfig(v.Sub("auth"))
 	if err != nil {
-		return Config{}, err
+		return nil, err
 	}
 	result.Auth = auth
 
@@ -62,7 +57,7 @@ func ParseConfig(v *viper.Viper) (Config, error) {
 	validate := validator.New()
 	err = validate.Struct(result)
 	if err != nil {
-		return Config{}, err
+		return nil, err
 	}
-	return result, nil
+	return &result, nil
 }
