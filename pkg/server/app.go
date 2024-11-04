@@ -5,6 +5,8 @@ import (
 	"gmountie/pkg/server/controller"
 	"gmountie/pkg/server/grpc"
 	"gmountie/pkg/server/service"
+
+	"github.com/pkg/errors"
 )
 
 type AppContext struct {
@@ -32,4 +34,20 @@ func (c *AppContext) GetGrpcServices() []grpc.ServiceRegistrar {
 		controller.NewRpcFileServer(c.VolumeService),
 		controller.NewVolumeService(c.VolumeService),
 	}
+}
+
+// Start starts the server.
+func Start(cfg *config.Config) error {
+	context := NewServerAppContext(cfg)
+
+	s := grpc.NewServer(
+		cfg,
+		context.AuthService,
+		context.GetGrpcServices(),
+	)
+
+	if err := s.Serve(); err != nil {
+		return errors.Wrap(err, "failed to start server")
+	}
+	return nil
 }

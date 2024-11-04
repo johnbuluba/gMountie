@@ -3,8 +3,8 @@
     import { goto } from '$app/navigation'
 
     let endpoint: string = "127.0.0.1:9449"
-    let username: string = "john"
-    let password: string = "123456"
+    let username: string = "admin"
+    let password: string = "admin"
 
     function login(): void {
         Login(endpoint, username, password).then((result) => {
