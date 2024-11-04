@@ -4,6 +4,7 @@ package service
 
 import (
 	context "context"
+	service "gmountie/pkg/server/service"
 
 	mock "github.com/stretchr/testify/mock"
 )
@@ -22,7 +23,7 @@ func (_m *MockAuthService) EXPECT() *MockAuthService_Expecter {
 }
 
 // Authorize provides a mock function with given fields: ctx, method
-func (_m *MockAuthService) Authorize(ctx context.Context, method string) (bool, error) {
+func (_m *MockAuthService) Authorize(ctx context.Context, method string) (bool, *service.UserDetails, error) {
 	ret := _m.Called(ctx, method)
 
 	if len(ret) == 0 {
@@ -30,8 +31,9 @@ func (_m *MockAuthService) Authorize(ctx context.Context, method string) (bool, 
 	}
 
 	var r0 bool
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) (bool, error)); ok {
+	var r1 *service.UserDetails
+	var r2 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) (bool, *service.UserDetails, error)); ok {
 		return rf(ctx, method)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, string) bool); ok {
@@ -40,13 +42,21 @@ func (_m *MockAuthService) Authorize(ctx context.Context, method string) (bool, 
 		r0 = ret.Get(0).(bool)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, string) *service.UserDetails); ok {
 		r1 = rf(ctx, method)
 	} else {
-		r1 = ret.Error(1)
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(*service.UserDetails)
+		}
 	}
 
-	return r0, r1
+	if rf, ok := ret.Get(2).(func(context.Context, string) error); ok {
+		r2 = rf(ctx, method)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
 }
 
 // MockAuthService_Authorize_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Authorize'
@@ -68,12 +78,12 @@ func (_c *MockAuthService_Authorize_Call) Run(run func(ctx context.Context, meth
 	return _c
 }
 
-func (_c *MockAuthService_Authorize_Call) Return(_a0 bool, _a1 error) *MockAuthService_Authorize_Call {
-	_c.Call.Return(_a0, _a1)
+func (_c *MockAuthService_Authorize_Call) Return(_a0 bool, _a1 *service.UserDetails, _a2 error) *MockAuthService_Authorize_Call {
+	_c.Call.Return(_a0, _a1, _a2)
 	return _c
 }
 
-func (_c *MockAuthService_Authorize_Call) RunAndReturn(run func(context.Context, string) (bool, error)) *MockAuthService_Authorize_Call {
+func (_c *MockAuthService_Authorize_Call) RunAndReturn(run func(context.Context, string) (bool, *service.UserDetails, error)) *MockAuthService_Authorize_Call {
 	_c.Call.Return(run)
 	return _c
 }

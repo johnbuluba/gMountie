@@ -11,6 +11,9 @@ packages:
     config:
       recursive: true
       include-regex: ".*(Repository|Service)"
+  gmountie/pkg/proto:
+    config:
+      all: true
   github.com/hanwen/go-fuse/v2/fuse/pathfs:
     interfaces:
       FileSystem:

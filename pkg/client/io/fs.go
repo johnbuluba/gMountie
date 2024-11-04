@@ -14,12 +14,12 @@ import (
 
 type LocalFileSystem struct {
 	volume string
-	client *grpc.Client
+	client grpc.Client
 	pathfs.FileSystem
 }
 
 // NewLocalFileSystem creates a new LocalFileSystem
-func NewLocalFileSystem(client *grpc.Client, volume string) pathfs.FileSystem {
+func NewLocalFileSystem(client grpc.Client, volume string) pathfs.FileSystem {
 	return &LocalFileSystem{
 		volume:     volume,
 		client:     client,
@@ -41,7 +41,7 @@ func (fs *LocalFileSystem) GetAttr(name string, context *fuse.Context) (*fuse.At
 			Cancel: make(chan struct{}),
 		}
 	}
-	res, err := fs.client.Fs.GetAttr(context, &proto.GetAttrRequest{
+	res, err := fs.client.Fs().GetAttr(context, &proto.GetAttrRequest{
 		Volume: fs.volume,
 		Caller: createCaller(context),
 		Path:   name,
@@ -76,7 +76,7 @@ func (fs *LocalFileSystem) GetAttr(name string, context *fuse.Context) (*fuse.At
 
 // Mkdir creates a directory
 func (fs *LocalFileSystem) Mkdir(name string, mode uint32, context *fuse.Context) fuse.Status {
-	res, err := fs.client.Fs.Mkdir(context, &proto.MkdirRequest{
+	res, err := fs.client.Fs().Mkdir(context, &proto.MkdirRequest{
 		Volume: fs.volume,
 		Caller: createCaller(context),
 		Path:   name,
@@ -91,7 +91,7 @@ func (fs *LocalFileSystem) Mkdir(name string, mode uint32, context *fuse.Context
 
 // Rmdir removes a directory
 func (fs *LocalFileSystem) Rmdir(name string, context *fuse.Context) (code fuse.Status) {
-	res, err := fs.client.Fs.Rmdir(context, &proto.RmdirRequest{
+	res, err := fs.client.Fs().Rmdir(context, &proto.RmdirRequest{
 		Volume: fs.volume,
 		Caller: createCaller(context),
 		Path:   name,
@@ -105,7 +105,7 @@ func (fs *LocalFileSystem) Rmdir(name string, context *fuse.Context) (code fuse.
 
 // Rename renames a file
 func (fs *LocalFileSystem) Rename(oldName string, newName string, context *fuse.Context) (code fuse.Status) {
-	res, err := fs.client.Fs.Rename(context, &proto.RenameRequest{
+	res, err := fs.client.Fs().Rename(context, &proto.RenameRequest{
 		Volume:  fs.volume,
 		Caller:  createCaller(context),
 		OldName: oldName,
@@ -120,7 +120,7 @@ func (fs *LocalFileSystem) Rename(oldName string, newName string, context *fuse.
 
 // OpenDir opens a directory
 func (fs *LocalFileSystem) OpenDir(name string, context *fuse.Context) (stream []fuse.DirEntry, code fuse.Status) {
-	res, err := fs.client.Fs.OpenDir(context, &proto.OpenDirRequest{
+	res, err := fs.client.Fs().OpenDir(context, &proto.OpenDirRequest{
 		Volume: fs.volume,
 		Caller: createCaller(context),
 		Path:   name,
@@ -142,7 +142,7 @@ func (fs *LocalFileSystem) OpenDir(name string, context *fuse.Context) (stream [
 }
 
 func (fs *LocalFileSystem) Open(name string, flags uint32, context *fuse.Context) (file nodefs.File, code fuse.Status) {
-	res, err := fs.client.File.Open(context, &proto.OpenRequest{
+	res, err := fs.client.File().Open(context, &proto.OpenRequest{
 		Volume: fs.volume,
 		Caller: createCaller(context),
 		Path:   name,
@@ -155,11 +155,11 @@ func (fs *LocalFileSystem) Open(name string, flags uint32, context *fuse.Context
 	if fuse.Status(res.Status) != fuse.OK {
 		return nil, fuse.Status(res.Status)
 	}
-	return NewGrpcFile(fs.client.File, fs.volume, name, res.Fd), fuse.Status(res.Status)
+	return NewGrpcFile(fs.client.File(), fs.volume, name, res.Fd), fuse.Status(res.Status)
 }
 
 func (fs *LocalFileSystem) Create(name string, flags uint32, mode uint32, context *fuse.Context) (file nodefs.File, code fuse.Status) {
-	res, err := fs.client.File.Create(context, &proto.CreateRequest{
+	res, err := fs.client.File().Create(context, &proto.CreateRequest{
 		Volume: fs.volume,
 		Caller: createCaller(context),
 		Path:   name,
@@ -173,11 +173,11 @@ func (fs *LocalFileSystem) Create(name string, flags uint32, mode uint32, contex
 	if fuse.Status(res.Status) != fuse.OK {
 		return nil, fuse.Status(res.Status)
 	}
-	return NewGrpcFile(fs.client.File, fs.volume, name, res.Fd), fuse.Status(res.Status)
+	return NewGrpcFile(fs.client.File(), fs.volume, name, res.Fd), fuse.Status(res.Status)
 }
 
 func (fs *LocalFileSystem) Unlink(name string, context *fuse.Context) (code fuse.Status) {
-	res, err := fs.client.Fs.Unlink(context, &proto.UnlinkRequest{
+	res, err := fs.client.Fs().Unlink(context, &proto.UnlinkRequest{
 		Volume: fs.volume,
 		Caller: createCaller(context),
 		Path:   name,
@@ -190,7 +190,7 @@ func (fs *LocalFileSystem) Unlink(name string, context *fuse.Context) (code fuse
 }
 
 func (fs *LocalFileSystem) Access(name string, mode uint32, context *fuse.Context) (code fuse.Status) {
-	res, err := fs.client.Fs.Access(context, &proto.AccessRequest{
+	res, err := fs.client.Fs().Access(context, &proto.AccessRequest{
 		Volume: fs.volume,
 		Caller: createCaller(context),
 		Path:   name,
@@ -205,7 +205,7 @@ func (fs *LocalFileSystem) Access(name string, mode uint32, context *fuse.Contex
 
 // Truncate truncates a file
 func (fs *LocalFileSystem) Truncate(name string, size uint64, context *fuse.Context) (code fuse.Status) {
-	res, err := fs.client.Fs.Truncate(context, &proto.TruncateRequest{
+	res, err := fs.client.Fs().Truncate(context, &proto.TruncateRequest{
 		Volume: fs.volume,
 		Caller: createCaller(context),
 		Path:   name,
@@ -220,7 +220,7 @@ func (fs *LocalFileSystem) Truncate(name string, size uint64, context *fuse.Cont
 
 // Chmod changes the mode of a file
 func (fs *LocalFileSystem) Chmod(name string, mode uint32, context *fuse.Context) (code fuse.Status) {
-	res, err := fs.client.Fs.Chmod(context, &proto.ChmodRequest{
+	res, err := fs.client.Fs().Chmod(context, &proto.ChmodRequest{
 		Volume: fs.volume,
 		Caller: createCaller(context),
 		Path:   name,
@@ -235,7 +235,7 @@ func (fs *LocalFileSystem) Chmod(name string, mode uint32, context *fuse.Context
 
 // Chown changes the owner of a file
 func (fs *LocalFileSystem) Chown(name string, uid uint32, gid uint32, context *fuse.Context) (code fuse.Status) {
-	res, err := fs.client.Fs.Chown(context, &proto.ChownRequest{
+	res, err := fs.client.Fs().Chown(context, &proto.ChownRequest{
 		Volume: fs.volume,
 		Caller: createCaller(context),
 		Path:   name,
@@ -253,7 +253,7 @@ func (fs *LocalFileSystem) Chown(name string, uid uint32, gid uint32, context *f
 
 // GetXAttr gets an extended attribute
 func (fs *LocalFileSystem) GetXAttr(name string, attribute string, context *fuse.Context) (data []byte, code fuse.Status) {
-	res, err := fs.client.Fs.GetXAttr(
+	res, err := fs.client.Fs().GetXAttr(
 		context,
 		&proto.GetXAttrRequest{
 			Volume: fs.volume, Caller: createCaller(context), Path: name, Attribute: attribute,
@@ -267,7 +267,7 @@ func (fs *LocalFileSystem) GetXAttr(name string, attribute string, context *fuse
 }
 
 func (fs *LocalFileSystem) StatFs(name string) *fuse.StatfsOut {
-	res, err := fs.client.Fs.StatFs(context.Background(), &proto.StatFsRequest{Volume: fs.volume, Path: name})
+	res, err := fs.client.Fs().StatFs(context.Background(), &proto.StatFsRequest{Volume: fs.volume, Path: name})
 	if err != nil || res == nil {
 		log.Log.Error("error in call: StatFs", zap.String("path", name), zap.Error(err))
 		return nil

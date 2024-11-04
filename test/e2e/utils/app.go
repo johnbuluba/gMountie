@@ -31,7 +31,7 @@ type AppTestingContext struct {
 	// server is the gRPC server.
 	server *grpcServer.Server
 	// client is the gRPC client.
-	client *grpcClient.Client
+	client grpcClient.Client
 	// volumes are the test volumes.
 	volumes []*TestVolume
 }
@@ -117,7 +117,7 @@ func (c *AppTestingContext) GetClientApp() *client.AppContext {
 }
 
 // GetClient returns the gRPC client.
-func (c *AppTestingContext) GetClient() *grpcClient.Client {
+func (c *AppTestingContext) GetClient() grpcClient.Client {
 	return c.client
 }
 

@@ -36,13 +36,13 @@ type VFSVolumeMounterImpl struct {
 	// volumes is the map of volumes mounted
 	volumes *xsync.MapOf[string, *pathfs.PathNodeFs]
 	// client is the grpc client
-	client *grpc.Client
+	client grpc.Client
 	// initialized is a flag to check if the mounter is initialized
 	initialized bool
 }
 
 // NewMultiVolumeMounter creates a new VFSVolumeMounterImpl
-func NewMultiVolumeMounter(client *grpc.Client, path string) VFSVolumeMounter {
+func NewMultiVolumeMounter(client grpc.Client, path string) VFSVolumeMounter {
 	m := &VFSVolumeMounterImpl{
 		path:        path,
 		volumes:     xsync.NewMapOf[string, *pathfs.PathNodeFs](),

@@ -14,11 +14,11 @@ type VolumeService interface {
 
 // VolumeServiceImpl is a service that provides information about the volumes
 type VolumeServiceImpl struct {
-	client *grpc.Client
+	client grpc.Client
 }
 
 // NewVolumeService creates a new VolumeServiceImpl
-func NewVolumeService(client *grpc.Client) VolumeService {
+func NewVolumeService(client grpc.Client) VolumeService {
 	return &VolumeServiceImpl{
 		client: client,
 	}
@@ -26,7 +26,7 @@ func NewVolumeService(client *grpc.Client) VolumeService {
 
 // GetVolumes returns a list of volumes
 func (v *VolumeServiceImpl) GetVolumes(ctx context.Context) ([]common.Volume, error) {
-	reply, err := v.client.Volume.List(ctx, &proto.VolumeListRequest{})
+	reply, err := v.client.Volume().List(ctx, &proto.VolumeListRequest{})
 	if err != nil {
 		return nil, err
 	}

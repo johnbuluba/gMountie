@@ -7,41 +7,57 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-// Client is a struct that holds the gRPC client
-type Client struct {
+// Client is the interface for the gRPC Client
+type Client interface {
+	// GetEndpoint returns the gRPC Client endpoint
+	GetEndpoint() string
+	// Connect connects to the gRPC server
+	Connect()
+	// Close closes the gRPC Client connection
+	Close() error
+	// File returns the gRPC File client
+	File() proto.RpcFileClient
+	// Fs returns the gRPC Fs client
+	Fs() proto.RpcFsClient
+	// Volume returns the gRPC Volume client
+	Volume() proto.VolumeServiceClient
+}
+
+// ClientImpl is a struct that holds the gRPC ClientImpl
+type ClientImpl struct {
 	endpoint    string
 	conn        *grpc.ClientConn
 	dialOptions []grpc.DialOption
-	Fs          proto.RpcFsClient
-	File        proto.RpcFileClient
-	Volume      proto.VolumeServiceClient
+	fs          proto.RpcFsClient
+	file        proto.RpcFileClient
+	volume      proto.VolumeServiceClient
 }
 
-// -------------------- Client Options --------------------
+// -------------------- ClientImpl Options --------------------
 
-// ClientOption is a type that defines the ClientOption function
-type ClientOption func(*Client)
+// ClientOption is a type that defines the ClientImplOption function
+type ClientOption func(*ClientImpl)
 
-// WithDialOptions sets the dial options for the gRPC client
+// WithDialOptions sets the dial options for the gRPC ClientImpl
 func WithDialOptions(dialOptions []grpc.DialOption) ClientOption {
-	return func(c *Client) {
+	return func(c *ClientImpl) {
 		// Append the dial options
 		c.dialOptions = append(c.dialOptions, dialOptions...)
 	}
 }
 
-// WithBasicAuth sets the basic authentication for the gRPC client
+// WithBasicAuth sets the basic authentication for the gRPC ClientImpl
 func WithBasicAuth(username, password string) ClientOption {
-	return func(c *Client) {
+	return func(c *ClientImpl) {
 		c.dialOptions = append(c.dialOptions, grpc.WithPerRPCCredentials(NewBasicAuthCredentials(username, password)))
 	}
 }
 
 // ---------------------- Constructor ----------------------
 
-// NewClient creates a new gRPC client
-func NewClient(endpoint string, options ...ClientOption) (*Client, error) {
-	c := Client{endpoint: endpoint}
+// NewClient creates a new gRPC ClientImpl
+func NewClient(endpoint string, options ...ClientOption) (Client, error) {
+	c := ClientImpl{endpoint: endpoint}
 	for _, opt := range options {
 		opt(&c)
 	}
@@ -53,38 +69,53 @@ func NewClient(endpoint string, options ...ClientOption) (*Client, error) {
 		return nil, err
 	}
 	c.conn = conn
-	c.File = proto.NewRpcFileClient(conn)
-	c.Fs = proto.NewRpcFsClient(conn)
-	c.Volume = proto.NewVolumeServiceClient(conn)
+	c.file = proto.NewRpcFileClient(conn)
+	c.fs = proto.NewRpcFsClient(conn)
+	c.volume = proto.NewVolumeServiceClient(conn)
 	return &c, nil
 }
 
 // ---------------------- Methods -----------------------
 
-// GetEndpoint returns the gRPC client endpoint
-func (c *Client) GetEndpoint() string {
+// GetEndpoint returns the gRPC ClientImpl endpoint
+func (c *ClientImpl) GetEndpoint() string {
 	return c.endpoint
 }
 
+// File returns the gRPC File client
+func (c *ClientImpl) File() proto.RpcFileClient {
+	return c.file
+}
+
+// Fs returns the gRPC Fs client
+func (c *ClientImpl) Fs() proto.RpcFsClient {
+	return c.fs
+}
+
+// Volume returns the gRPC Volume client
+func (c *ClientImpl) Volume() proto.VolumeServiceClient {
+	return c.volume
+}
+
 // Connect connects to the gRPC server
-func (c *Client) Connect() {
+func (c *ClientImpl) Connect() {
 	c.conn.Connect()
 }
 
-// Close closes the gRPC client connection
-func (c *Client) Close() error {
+// Close closes the gRPC ClientImpl connection
+func (c *ClientImpl) Close() error {
 	return c.conn.Close()
 }
 
-// GetInterceptors returns the client interceptors
+// GetInterceptors returns the ClientImpl interceptors
 func getInterceptors() []grpc.UnaryClientInterceptor {
 	return []grpc.UnaryClientInterceptor{
-		//logging.UnaryClientInterceptor(grpc2.InterceptorLogger(log.Log)),
+		//logging.UnaryClientImplInterceptor(grpc2.InterceptorLogger(log.Log)),
 	}
 }
 
 // getDialOptions returns the dial options
-func (c *Client) getDialOptions() []grpc.DialOption {
+func (c *ClientImpl) getDialOptions() []grpc.DialOption {
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		//grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{})),

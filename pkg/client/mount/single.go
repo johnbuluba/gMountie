@@ -20,12 +20,12 @@ type SingleVolumeMounter interface {
 
 // SingleVolumeMounterImpl is a service that mounts volumes
 type SingleVolumeMounterImpl struct {
-	client *grpc.Client
+	client grpc.Client
 	mounts *xsync.MapOf[string, *fuse.Server]
 }
 
 // NewSingleVolumeMounter creates a new SingleVolumeMounterImpl
-func NewSingleVolumeMounter(client *grpc.Client) SingleVolumeMounter {
+func NewSingleVolumeMounter(client grpc.Client) SingleVolumeMounter {
 	return &SingleVolumeMounterImpl{
 		client: client,
 		mounts: xsync.NewMapOf[string, *fuse.Server](),

@@ -10,14 +10,14 @@ import (
 
 // AppContext is a struct that holds the application context.
 type AppContext struct {
-	client              *grpc.Client
+	client              grpc.Client
 	VolumeService       service.VolumeService
 	SingleVolumeMounter mount.SingleVolumeMounter
 	MultiVolumeMounter  mount.VFSVolumeMounter
 }
 
 // NewAppContext creates a new AppContext.
-func NewAppContext(client *grpc.Client, multiMountPath string) *AppContext {
+func NewAppContext(client grpc.Client, multiMountPath string) *AppContext {
 	log.Log.Info("creating app context")
 	return &AppContext{
 		client:              client,
