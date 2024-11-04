@@ -33,3 +33,5 @@ out
 dist/
 
 .task
+
+.codebuddy
