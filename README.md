@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="assets/logo-full-cropped.png" alt="gMountie Logo" width="300"/>
+  <img src="assets/logo-full-cropped-min.png" alt="gMountie Logo" width="300"/>
   <p><i>Simplifying remote filesystem mounting with FUSE and gRPC</i></p>
 </div>
 
@@ -68,7 +68,7 @@ Please review our [contribution guidelines](CONTRIBUTING.md) for more informatio
 
 ## License
 
-gMountie is released under the MIT License. See the [LICENSE](LICENSE) file for details.
+gMountie is released under the Apache License. See the [LICENSE](LICENSE) file for details.
 
 ---
 
