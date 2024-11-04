@@ -24,5 +24,7 @@ config:
       type: blocking
     - cmd: wails3 task build
       type: blocking
+    - cmd: touch frontend/build/.gitkeep
+      type: blocking
     - cmd: wails3 task run
       type: primary

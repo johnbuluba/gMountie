@@ -390,6 +390,7 @@ tasks:
           BUILD_FLAGS: '{{.BUILD_FLAGS}}'
     cmds:
       - npm run build -q
+      - touch build/.gitkeep
 
   generate:bindings:
     summary: Generates bindings for the frontend
