@@ -157,14 +157,9 @@ func (c *AppTestingContext) Start() error {
 // Close closes the gRPC server.
 func (c *AppTestingContext) Close() error {
 	// Close the volumes
-	for _, v := range c.volumes {
-		err := c.UnmountVolume(v)
-		if err != nil {
-			return err
-		}
-		if err = v.Close(); err != nil {
-			return err
-		}
+	err := c.clientCtx.Close()
+	if err != nil {
+		return err
 	}
 	// Close the server
 	c.server.Stop(true)

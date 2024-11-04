@@ -8,6 +8,7 @@ import (
 	"github.com/hanwen/go-fuse/v2/fuse"
 	"github.com/hanwen/go-fuse/v2/fuse/nodefs"
 	"github.com/hanwen/go-fuse/v2/fuse/pathfs"
+	"github.com/pkg/errors"
 	"github.com/puzpuzpuz/xsync/v3"
 	"go.uber.org/zap"
 )
@@ -34,6 +35,11 @@ func NewSingleVolumeMounter(client grpc.Client) SingleVolumeMounter {
 
 // Mount mounts a volume
 func (m *SingleVolumeMounterImpl) Mount(volume, path string) error {
+	// Check if the volume is already mounted
+	if m.IsVolumeMounted(volume) {
+		return errors.Errorf("volume %s is already mounted", volume)
+	}
+
 	fs := io.NewLocalFileSystem(m.client, volume)
 	nodeFS := pathfs.NewPathNodeFs(fs, createFsOptions())
 	connector := nodefs.NewFileSystemConnector(nodeFS.Root(), createConnectorOptions())
@@ -72,7 +78,7 @@ func (m *SingleVolumeMounterImpl) GetMounts() []string {
 func (m *SingleVolumeMounterImpl) Unmount(volume string) error {
 	server, ok := m.mounts.Load(volume)
 	if !ok {
-		return nil
+		return errors.Errorf("volume %s is not mounted", volume)
 	}
 	if err := stopServer(server); err != nil {
 		return err
