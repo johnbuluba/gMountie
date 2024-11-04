@@ -14,9 +14,11 @@ import (
 
 type ServeCmdTestSuite struct {
 	suite.Suite
-	cmd     *cobra.Command
-	buf     *bytes.Buffer
-	tempDir string
+	cmd                 *cobra.Command
+	buf                 *bytes.Buffer
+	tempDir             string
+	serverStartCalled   bool
+	originalServerStart func(config2 *config.Config) error
 }
 
 func (s *ServeCmdTestSuite) SetupTest() {
@@ -27,30 +29,28 @@ func (s *ServeCmdTestSuite) SetupTest() {
 	s.cmd.AddCommand(serveCmd)
 	s.buf = new(bytes.Buffer)
 	s.cmd.SetOutput(s.buf)
+
+	s.serverStartCalled = false
+	s.originalServerStart = serverStart
+	serverStart = func(cfg *config.Config) error {
+		s.serverStartCalled = true
+		return nil
+	}
 }
 
 func (s *ServeCmdTestSuite) TearDownTest() {
+	serverStart = s.originalServerStart
 	utils.Must0(s.T(), os.RemoveAll(s.tempDir))
 }
 
 func (s *ServeCmdTestSuite) TestServeCmd_ExecuteWithoutConfig() {
-	// Setup
-	originalServerStart := serverStart
-	defer func() { serverStart = originalServerStart }()
-
-	serverStartCalled := false
-	serverStart = func(cfg *config.Config) error {
-		serverStartCalled = true
-		return nil
-	}
-
 	// Test
 	s.cmd.SetArgs([]string{"serve"})
 	err := s.cmd.Execute()
 
 	// Verify
 	s.Require().NoError(err)
-	s.Assert().True(serverStartCalled)
+	s.Assert().True(s.serverStartCalled)
 
 	// Check if default config was created
 	defaultConfigPath := config.GetDefaultConfigPath()
@@ -60,19 +60,16 @@ func (s *ServeCmdTestSuite) TestServeCmd_ExecuteWithoutConfig() {
 
 func (s *ServeCmdTestSuite) TestServeCmd_ExecuteWithInvalidConfig() {
 	// Setup
-	configFile := filepath.Join(s.tempDir, ".config", "gmountie", "config.yaml")
+	configFile = filepath.Join(s.tempDir, ".config", "gmountie", "config.yaml")
 	utils.Must0(s.T(), os.MkdirAll(filepath.Dir(configFile), 0755))
 	utils.Must0(s.T(), os.WriteFile(configFile, []byte("test-config"), 0644))
-
-	originalServerStart := serverStart
-	defer func() { serverStart = originalServerStart }()
 
 	// Test
 	s.cmd.SetArgs([]string{"serve"})
 	err := s.cmd.Execute()
 
 	// Verify
-	s.Require().Error(err)
+	s.Require().Error(err, "failed to parse config")
 }
 
 func TestServeCmdSuite(t *testing.T) {

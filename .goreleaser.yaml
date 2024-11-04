@@ -62,7 +62,7 @@ release:
   prerelease: true
   extra_files:
     - glob: ./ui/bin/gmountie-desktop-x86_64.AppImage
-      name_template: 'gMountieUI_{{ .Version }}-x86_64.AppImage'
+      name_template: 'gMountie-desktop_{{ .Version }}-x86_64.AppImage'
 
 changelog:
   sort: asc

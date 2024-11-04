@@ -17,6 +17,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	_ "google.golang.org/grpc/encoding/gzip" // Installing the gzip encoding as an available compressor.
 	"google.golang.org/grpc/reflection"
 )
@@ -153,6 +154,12 @@ func (s *Server) getOptions() []grpc.ServerOption {
 func (s *Server) getLoggingInterceptor() (grpc.UnaryServerInterceptor, grpc.StreamServerInterceptor) {
 	opts := []logging.Option{
 		logging.WithLogOnEvents(logging.FinishCall),
+		logging.WithLevels(func(code codes.Code) logging.Level {
+			if code == codes.OK {
+				return logging.LevelDebug
+			}
+			return logging.DefaultServerCodeToLevel(code)
+		}),
 		// Add any other option (check functions starting with logging.With).
 	}
 	unary := logging.UnaryServerInterceptor(grpc2.InterceptorLogger(log.Log), opts...)

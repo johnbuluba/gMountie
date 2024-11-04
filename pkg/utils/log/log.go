@@ -13,7 +13,7 @@ func init() {
 
 	// Set logger to warn level for tests
 	zapConfig := zap.Config{
-		Level:       zap.NewAtomicLevelAt(zap.DebugLevel),
+		Level:       zap.NewAtomicLevelAt(zap.InfoLevel),
 		Development: true,
 		Sampling: &zap.SamplingConfig{
 			Initial:    100,
