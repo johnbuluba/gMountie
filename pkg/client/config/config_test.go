@@ -1,6 +1,7 @@
 package config
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
@@ -27,6 +28,50 @@ server:
 auth:
   type: none
 `
+}
+
+// Test String() function
+func (s *ConfigTestSuite) TestString() {
+	cfg, err := LoadConfigFromString(s.fullConf, "")
+	s.Require().NoError(err)
+
+	str, err := cfg.String()
+	s.Require().NoError(err)
+	s.Assert().Contains(str, "address: 0.0.0.0")
+	s.Assert().Contains(str, "port: 9449")
+	s.Assert().Contains(str, "type: none")
+}
+
+// Test Save() function
+func (s *ConfigTestSuite) TestSave() {
+	// Create a temporary file
+	tmpfile, err := os.CreateTemp("", "config_test_*.yaml")
+	s.Require().NoError(err)
+	s.T().Cleanup(func() {
+		os.Remove(tmpfile.Name())
+	})
+
+	// Load config and set path
+	cfg, err := LoadConfigFromString(s.fullConf, tmpfile.Name())
+	s.Require().NoError(err)
+
+	// Test Save
+	err = cfg.Save()
+	s.Require().NoError(err)
+
+	// Verify file contents
+	content, err := os.ReadFile(tmpfile.Name())
+	s.Require().NoError(err)
+	s.Assert().Contains(string(content), "address: 0.0.0.0")
+}
+
+// Test Save() with invalid path
+func (s *ConfigTestSuite) TestSaveInvalidPath() {
+	cfg, err := LoadConfigFromString(s.fullConf, "/nonexistent/path/config.yaml")
+	s.Require().NoError(err)
+
+	err = cfg.Save()
+	s.Require().Error(err)
 }
 
 // Test Runner

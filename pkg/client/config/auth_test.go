@@ -15,10 +15,12 @@ type AuthConfigTestSuite struct {
 // Test successful parsing of "none" auth configuration
 func (s *AuthConfigTestSuite) TestParse_NoneAuth() {
 	conf := `
+server:
+  address: 127.0.0.1
 auth:
   type: none
 `
-	result, err := LoadConfigFromString(conf + minimalServerConfig)
+	result, err := LoadConfigFromString(conf, "")
 	s.Require().NoError(err)
 	s.Assert().Equal(serverConfig.AuthConfigTypeNone, result.Auth.GetType())
 }
@@ -26,12 +28,14 @@ auth:
 // Test successful parsing of basic auth configuration
 func (s *AuthConfigTestSuite) TestParse_BasicAuth() {
 	conf := `
+server:
+  address: 127.0.0.1
 auth:
   type: basic
   username: testuser
   password: testpass
 `
-	result, err := LoadConfigFromString(conf + minimalServerConfig)
+	result, err := LoadConfigFromString(conf, "")
 	s.Require().NoError(err)
 	s.Assert().Equal(serverConfig.AuthConfigTypeBasic, result.Auth.GetType())
 
@@ -39,15 +43,20 @@ auth:
 	s.Require().True(ok)
 	s.Assert().Equal("testuser", basicAuth.Username)
 	s.Assert().Equal("testpass", basicAuth.Password)
+	test, err := result.String()
+	s.Require().NoError(err)
+	s.Assert().Contains(test, "testuser")
 }
 
 // Test error cases for invalid auth type
 func (s *AuthConfigTestSuite) TestParse_InvalidAuthType() {
 	conf := `
+server:
+  address: 127.0.0.1
 auth:
   type: invalid
 `
-	_, err := LoadConfigFromString(conf + minimalServerConfig)
+	_, err := LoadConfigFromString(conf, "")
 	s.Require().Error(err)
 	s.Assert().Contains(err.Error(), "invalid auth type")
 }
@@ -56,20 +65,24 @@ auth:
 func (s *AuthConfigTestSuite) TestParse_MissingBasicAuthFields() {
 	// Missing username
 	conf1 := `
+server:
+  address: 127.0.0.1
 auth:
   type: basic
   password: testpass
 `
-	_, err := LoadConfigFromString(conf1 + minimalServerConfig)
+	_, err := LoadConfigFromString(conf1, "")
 	s.Require().Error(err)
 
 	// Missing password
 	conf2 := `
+server:
+  address: 127.0.0.1
 auth:
   type: basic
   username: testuser
 `
-	_, err = LoadConfigFromString(conf2 + minimalServerConfig)
+	_, err = LoadConfigFromString(conf2, "")
 	s.Require().Error(err)
 }
 
@@ -81,7 +94,7 @@ auth:
   username: ""
   password: ""
 `
-	_, err := LoadConfigFromString(conf + minimalServerConfig)
+	_, err := LoadConfigFromString(conf+minimalServerConfig, "")
 	s.Require().Error(err)
 }
 
@@ -107,7 +120,7 @@ auth:
   username: testuser
   password: testpass
 `
-	result, err := LoadConfigFromString(conf)
+	result, err := LoadConfigFromString(conf, "")
 	s.Require().NoError(err)
 	s.Assert().NotNil(result.Server)
 	s.Assert().NotNil(result.Auth)
@@ -117,6 +130,8 @@ auth:
 var minimalServerConfig = `
 server:
   address: 127.0.0.1
+auth:
+  type: none
 `
 
 func TestAuthConfigTestSuite(t *testing.T) {

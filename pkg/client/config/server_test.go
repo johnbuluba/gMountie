@@ -20,7 +20,7 @@ server:
 auth:
   type: none
 `
-	result, err := LoadConfigFromString(conf)
+	result, err := LoadConfigFromString(conf, "")
 	s.Require().NoError(err)
 	s.Assert().Equal("0.0.0.0", result.Server.Address)
 	s.Assert().Equal(uint(9449), result.Server.Port)
@@ -35,7 +35,7 @@ server:
 auth:
   type: none
 `
-	result, err := LoadConfigFromString(conf)
+	result, err := LoadConfigFromString(conf, "")
 	s.Require().NoError(err)
 	s.Assert().Equal("127.0.0.1", result.Server.Address)
 	s.Assert().Equal(uint(9449), result.Server.Port) // Should use default port
@@ -51,7 +51,7 @@ server:
 auth:
   type: none
 `
-	_, err := LoadConfigFromString(conf)
+	_, err := LoadConfigFromString(conf, "")
 	s.Require().Error(err)
 }
 
@@ -63,7 +63,7 @@ server:
 auth:
   type: none
 `
-	_, err := LoadConfigFromString(conf)
+	_, err := LoadConfigFromString(conf, "")
 	s.Require().Error(err)
 }
 
@@ -74,7 +74,7 @@ someother:
 auth:
   type: none
 `
-	_, err := LoadConfigFromString(conf)
+	_, err := LoadConfigFromString(conf, "")
 	s.Require().Error(err)
 }
 
@@ -88,7 +88,7 @@ server:
 auth:
   type: none
 `
-	result, err := LoadConfigFromString(conf)
+	result, err := LoadConfigFromString(conf, "")
 	s.Require().NoError(err)
 	s.Assert().True(result.Server.TLS)
 }

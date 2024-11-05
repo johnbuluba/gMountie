@@ -18,12 +18,12 @@ type AuthConfig interface {
 	GetType() AuthConfigType
 }
 
-// authConfig is a struct that holds the configuration for the auth
-type authConfig struct {
+// AuthConfigBase is a struct that holds the configuration for the auth
+type AuthConfigBase struct {
 	Type AuthConfigType
 }
 
-func (a *authConfig) GetType() AuthConfigType {
+func (a *AuthConfigBase) GetType() AuthConfigType {
 	return a.Type
 }
 
@@ -51,13 +51,13 @@ func NewFromConfig(v *viper.Viper) (AuthConfig, error) {
 
 // NoneAuthConfig is a struct that holds the configuration for the none auth
 type NoneAuthConfig struct {
-	authConfig
+	AuthConfigBase
 }
 
 // NewNoneAuthConfig creates a new NoneAuthConfig with defaults
 func NewNoneAuthConfig(v *viper.Viper) *NoneAuthConfig {
 	return &NoneAuthConfig{
-		authConfig: authConfig{
+		AuthConfigBase: AuthConfigBase{
 			Type: AuthConfigTypeNone,
 		},
 	}
@@ -78,7 +78,7 @@ type BasicAuthConfigUser struct {
 
 // BasicAuthConfig is a struct that holds the configuration for the basic auth
 type BasicAuthConfig struct {
-	authConfig
+	AuthConfigBase
 	Users []BasicAuthConfigUser `validate:"required,dive"`
 }
 
