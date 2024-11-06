@@ -1,14 +1,30 @@
 package commands
 
 import (
+	"gmountie/pkg/common/config"
 	"gmountie/pkg/server"
-	"gmountie/pkg/server/config"
+	serverConfig "gmountie/pkg/server/config"
 	"gmountie/pkg/utils/log"
 	"os"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
+)
+
+const (
+	DefaultConfigName = "gmountie-server"
+	DefaultConfig     = `server:
+  address: 127.0.0.1
+  port: 9449
+  metrics: true
+
+auth:
+  type: basic
+  users:
+    - username: admin
+      password: admin
+`
 )
 
 // For testing purposes
@@ -25,7 +41,7 @@ var serveCmd = &cobra.Command{
 		)
 
 		if configFile == "" {
-			configFile = config.GetDefaultConfigPath()
+			configFile = config.GetDefaultConfigPath(DefaultConfigName)
 		}
 
 		// Try to read the config file
@@ -43,17 +59,17 @@ var serveCmd = &cobra.Command{
 				return err
 			}
 
-			if err := config.WriteDefaultConfig(); err != nil {
+			if err := config.WriteDefaultConfig(DefaultConfigName, DefaultConfig); err != nil {
 				return err
 			}
 
-			cfgString = config.DefaultConfig
+			cfgString = DefaultConfig
 		} else {
 			cfgString = string(data)
 		}
 
 		// Parse config
-		cfg, err := config.LoadConfigFromString(cfgString)
+		cfg, err := serverConfig.LoadConfigFromString(cfgString)
 		if err != nil {
 			return errors.Wrap(err, "failed to parse config")
 		}

@@ -24,8 +24,9 @@ type MountConfig interface {
 
 // SingleMountConfig is a struct that holds the configuration for a single mount
 type SingleMountConfig struct {
-	Path   string `validate:"required"`
-	Volume string `validate:"required"`
+	Type   MountType `validate:"required"`
+	Path   string    `validate:"required"`
+	Volume string    `validate:"required"`
 }
 
 // GetType returns the mount type
@@ -39,6 +40,7 @@ func NewSingleMountConfig(v *viper.Viper) (*SingleMountConfig, error) {
 	if err := v.Unmarshal(&mount); err != nil {
 		return nil, err
 	}
+	mount.Type = MountTypeSingle
 	return &mount, nil
 }
 
@@ -46,8 +48,9 @@ func NewSingleMountConfig(v *viper.Viper) (*SingleMountConfig, error) {
 
 // VFSMountConfig is a struct that holds the configuration for a VFS mount
 type VFSMountConfig struct {
-	Path     string `validate:"required"`
-	MountAll bool   `mapstructure:"mount_all"`
+	Type     MountType `validate:"required"`
+	Path     string    `validate:"required"`
+	MountAll bool      `mapstructure:"mount_all"`
 	Volumes  []string
 }
 
@@ -66,7 +69,7 @@ func NewVFSMountConfig(v *viper.Viper) (*VFSMountConfig, error) {
 	if err := v.Unmarshal(&mount); err != nil {
 		return nil, err
 	}
-
+	mount.Type = MountTypeSingle
 	return &mount, nil
 }
 

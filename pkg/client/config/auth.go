@@ -9,7 +9,8 @@ import (
 
 // BasicAuthConfig is a struct that holds the configuration for the basic auth user
 type BasicAuthConfig struct {
-	serverConfig.BasicAuthConfigUser
+	Type                             serverConfig.AuthConfigType `validate:"required"`
+	serverConfig.BasicAuthConfigUser `yaml:",inline"`
 }
 
 func (b BasicAuthConfig) GetType() serverConfig.AuthConfigType {
@@ -24,6 +25,7 @@ func NewBasicAuthConfig(v *viper.Viper) (*BasicAuthConfig, error) {
 	}
 
 	return &BasicAuthConfig{
+		Type:                serverConfig.AuthConfigTypeBasic,
 		BasicAuthConfigUser: user,
 	}, nil
 }

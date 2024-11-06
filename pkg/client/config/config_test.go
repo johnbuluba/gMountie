@@ -56,7 +56,7 @@ func (s *ConfigTestSuite) TestSave() {
 	s.Require().NoError(err)
 
 	// Test Save
-	err = cfg.Save()
+	err = cfg.Save(tmpfile.Name())
 	s.Require().NoError(err)
 
 	// Verify file contents
@@ -67,10 +67,11 @@ func (s *ConfigTestSuite) TestSave() {
 
 // Test Save() with invalid path
 func (s *ConfigTestSuite) TestSaveInvalidPath() {
-	cfg, err := LoadConfigFromString(s.fullConf, "/nonexistent/path/config.yaml")
+	path := "/nonexistent/path/config.yaml"
+	cfg, err := LoadConfigFromString(s.fullConf, path)
 	s.Require().NoError(err)
 
-	err = cfg.Save()
+	err = cfg.Save(path)
 	s.Require().Error(err)
 }
 

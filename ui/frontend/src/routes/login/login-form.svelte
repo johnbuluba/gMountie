@@ -1,17 +1,39 @@
 <script lang="ts">
-    import {Login} from 'bindings/gmountie/ui3/app'
     import { goto } from '$app/navigation'
+    import {
+        Login,
+        IsLoggedIn
+    } from "bindings/gmountie/pkg/ui/controller/logincontrollerimpl";
+    import {LogInInfo} from "bindings/gmountie/pkg/ui/controller";
 
-    let endpoint: string = "127.0.0.1:9449"
+    let address: string = "127.0.0.1"
+    let port: number = 9449
     let username: string = "admin"
     let password: string = "admin"
 
     function login(): void {
-        Login(endpoint, username, password).then((result) => {
-            console.log("Logged in")
-            goto('/main')
+        const loginInfo = {
+            Address: address,
+            Port: port,
+            Username: username,
+            Password: password
+        } as LogInInfo;
+        console.log(loginInfo)
+        Login(loginInfo).then((result) => {
+            if (result) {
+                console.log("Logged in")
+                goto('/main')
+            }
+            console.log("Failed to log in")
         })
     }
+
+    IsLoggedIn().then((result) => {
+        if (result) {
+            goto('/main')
+        }
+    })
+
 </script>
 
 
@@ -19,7 +41,11 @@
     <div class="card p-4 space-y-2">
         <label class="label">
             <span>Endpoint</span>
-            <input class="input" type="text" placeholder="Endpoint" bind:value={endpoint} />
+            <input class="input" type="text" placeholder="Address" bind:value={address} />
+        </label>
+        <label class="label">
+            <span>Endpoint</span>
+            <input class="input" type="number" placeholder="Port" bind:value={port} />
         </label>
         <label class="label">
             <span>Username</span>

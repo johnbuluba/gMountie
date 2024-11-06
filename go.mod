@@ -3,6 +3,7 @@ module gmountie
 go 1.23.0
 
 require (
+	github.com/adrg/xdg v0.5.3
 	github.com/avast/retry-go/v4 v4.6.0
 	github.com/go-playground/validator/v10 v10.22.1
 	github.com/go-task/task/v3 v3.39.2

@@ -2,6 +2,7 @@ package commands
 
 import (
 	"bytes"
+	commonConfig "gmountie/pkg/common/config"
 	"gmountie/pkg/server/config"
 	"gmountie/test/e2e/utils"
 	"os"
@@ -53,7 +54,7 @@ func (s *ServeCmdTestSuite) TestServeCmd_ExecuteWithoutConfig() {
 	s.Assert().True(s.serverStartCalled)
 
 	// Check if default config was created
-	defaultConfigPath := config.GetDefaultConfigPath()
+	defaultConfigPath := commonConfig.GetDefaultConfigPath(DefaultConfigName)
 	_, err = os.Stat(defaultConfigPath)
 	s.Assert().NoError(err)
 }

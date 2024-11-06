@@ -1,9 +1,14 @@
 <script lang="ts">
-    import {GetVolumes, Logout} from 'bindings/gmountie/ui3/app'
     import VolumesTable from "./table-volumes.svelte";
     import logo from "$lib/assets/images/logo-full-cropped.png";
     import {Avatar} from '@skeletonlabs/skeleton';
     import { goto } from '$app/navigation'
+    import {
+        GetVolumes
+    } from "bindings/gmountie/pkg/ui/controller/volumecontrollerimpl";
+    import {
+        Logout
+    } from "bindings/gmountie/pkg/ui/controller/logincontrollerimpl";
 
 
     let results = []

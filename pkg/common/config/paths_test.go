@@ -8,6 +8,10 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
+const (
+	defaultConfigFileName = "config.yaml"
+)
+
 type PathsTestSuite struct {
 	suite.Suite
 	tempDir string
@@ -53,10 +57,10 @@ func (s *PathsTestSuite) TestGetDefaultConfigPath() {
 	s.T().Setenv("XDG_CONFIG_HOME", s.tempDir)
 
 	// Test
-	result := GetDefaultConfigPath()
+	result := GetDefaultConfigPath(defaultConfigFileName)
 
 	// Verify
-	expected := filepath.Join(s.tempDir, DefaultConfigDirName, DefaultConfigFileName)
+	expected := filepath.Join(s.tempDir, DefaultConfigDirName, defaultConfigFileName)
 	s.Assert().Equal(expected, result)
 }
 
@@ -97,16 +101,16 @@ func (s *PathsTestSuite) TestWriteDefaultConfig() {
 	s.T().Setenv("XDG_CONFIG_HOME", s.tempDir)
 	err := EnsureConfigDir()
 	s.Require().NoError(err)
-
+	cfg := "test"
 	// Test
-	err = WriteDefaultConfig()
+	err = WriteDefaultConfig(defaultConfigFileName, cfg)
 
 	// Verify
 	s.Require().NoError(err)
-	configPath := GetDefaultConfigPath()
+	configPath := GetDefaultConfigPath(defaultConfigFileName)
 	content, err := os.ReadFile(configPath)
 	s.Require().NoError(err)
-	s.Assert().Equal(DefaultConfig, string(content))
+	s.Assert().Equal(cfg, string(content))
 }
 
 func (s *PathsTestSuite) TestWriteDefaultConfig_OverwriteExisting() {
@@ -114,18 +118,19 @@ func (s *PathsTestSuite) TestWriteDefaultConfig_OverwriteExisting() {
 	s.T().Setenv("XDG_CONFIG_HOME", s.tempDir)
 	err := EnsureConfigDir()
 	s.Require().NoError(err)
-	configPath := GetDefaultConfigPath()
+	configPath := GetDefaultConfigPath(defaultConfigFileName)
 	err = os.WriteFile(configPath, []byte("old content"), 0644)
 	s.Require().NoError(err)
+	cfg := "test"
 
 	// Test
-	err = WriteDefaultConfig()
+	err = WriteDefaultConfig(defaultConfigFileName, cfg)
 
 	// Verify
 	s.Require().NoError(err)
 	content, err := os.ReadFile(configPath)
 	s.Require().NoError(err)
-	s.Assert().Equal(DefaultConfig, string(content))
+	s.Assert().Equal(cfg, string(content))
 }
 
 func TestPathsTestSuite(t *testing.T) {

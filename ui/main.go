@@ -3,6 +3,9 @@ package main
 import (
 	"embed"
 	_ "embed"
+	"gmountie/pkg/common/config"
+	"gmountie/pkg/ui/controller"
+	"gmountie/pkg/ui/service"
 	"gmountie/pkg/utils/log"
 	"log/slog"
 
@@ -29,6 +32,26 @@ func main() {
 		Logger: log.Log.Named("ui"),
 	}
 
+	// Create a new instance of the AppService.
+	appSvc := service.NewAppService()
+
+	// Create a new instance of the ConfigService.
+	err := config.EnsureConfigDir()
+	if err != nil {
+		log.Log.Fatal("error while ensuring config dir exists", zap.Error(err))
+		return
+	}
+	configPath := config.GetDefaultConfigPath(config.DefaultClientConfigFileName)
+
+	configService, err := service.NewConfigService(configPath)
+	if err != nil {
+		log.Log.Fatal("error while creating config service", zap.Error(err))
+		return
+	}
+
+	loginController := controller.NewLoginControllerImpl(configService, appSvc)
+	volumeController := controller.NewVolumeControllerImpl(appSvc)
+
 	// Create a new Wails application by providing the necessary options.
 	// Variables 'Name' and 'Description' are for application metadata.
 	// 'Assets' configures the asset server with the 'FS' variable pointing to the frontend files.
@@ -38,7 +61,8 @@ func main() {
 		Name:        "gmountie-desktop",
 		Description: "A demo of using raw HTML & CSS",
 		Services: []application.Service{
-			application.NewService(&App{}),
+			application.NewService(loginController),
+			application.NewService(volumeController),
 		},
 		Assets: application.AssetOptions{
 			Handler: application.AssetFileServerFS(assets),
@@ -47,6 +71,11 @@ func main() {
 			ApplicationShouldTerminateAfterLastWindowClosed: true,
 		},
 		Logger: slog.New(logger.NewZapHandler()),
+		OnShutdown: func() {
+			if err := appSvc.GetContext().Close(); err != nil {
+				log.Log.Error("error while closing app context", zap.Error(err))
+			}
+		},
 	})
 
 	// Create a new window with the necessary options.
@@ -72,10 +101,8 @@ func main() {
 	})
 
 	// Run the application. This blocks until the application has been exited.
-	err := app.Run()
-
-	// If an error occurred while running the application, log it and exit.
-	if err != nil {
+	if err = app.Run(); err != nil {
 		log.Log.Fatal("error while running application", zap.Error(err))
+
 	}
 }

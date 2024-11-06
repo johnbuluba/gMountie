@@ -1,6 +1,10 @@
 <script lang="ts">
+
+
     import {Volume} from "bindings/gmountie/pkg/common";
-    import {IsMounted, Mount, Unmount} from 'bindings/gmountie/ui3/app'
+    import {
+        IsMounted, Mount, Unmount
+    } from "bindings/gmountie/pkg/ui/controller/volumecontrollerimpl";
 
     export let volume: Volume;
 
