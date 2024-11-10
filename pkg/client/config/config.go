@@ -63,7 +63,7 @@ func (c *Config) Save(path string) error {
 }
 
 // LoadConfigFromString loads a Config from a string
-func LoadConfigFromString(cfg string, path string) (*Config, error) {
+func LoadConfigFromString(cfg string) (*Config, error) {
 	c, err := config.LoadConfigFromString(cfg, ParseConfig)
 	if err != nil {
 		return nil, err

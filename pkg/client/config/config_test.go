@@ -32,7 +32,7 @@ auth:
 
 // Test String() function
 func (s *ConfigTestSuite) TestString() {
-	cfg, err := LoadConfigFromString(s.fullConf, "")
+	cfg, err := LoadConfigFromString(s.fullConf)
 	s.Require().NoError(err)
 
 	str, err := cfg.String()
@@ -52,7 +52,7 @@ func (s *ConfigTestSuite) TestSave() {
 	})
 
 	// Load config and set path
-	cfg, err := LoadConfigFromString(s.fullConf, tmpfile.Name())
+	cfg, err := LoadConfigFromString(s.fullConf)
 	s.Require().NoError(err)
 
 	// Test Save
@@ -68,7 +68,7 @@ func (s *ConfigTestSuite) TestSave() {
 // Test Save() with invalid path
 func (s *ConfigTestSuite) TestSaveInvalidPath() {
 	path := "/nonexistent/path/config.yaml"
-	cfg, err := LoadConfigFromString(s.fullConf, path)
+	cfg, err := LoadConfigFromString(s.fullConf)
 	s.Require().NoError(err)
 
 	err = cfg.Save(path)

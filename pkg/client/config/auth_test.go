@@ -20,7 +20,7 @@ server:
 auth:
   type: none
 `
-	result, err := LoadConfigFromString(conf, "")
+	result, err := LoadConfigFromString(conf)
 	s.Require().NoError(err)
 	s.Assert().Equal(serverConfig.AuthConfigTypeNone, result.Auth.GetType())
 }
@@ -35,7 +35,7 @@ auth:
   username: testuser
   password: testpass
 `
-	result, err := LoadConfigFromString(conf, "")
+	result, err := LoadConfigFromString(conf)
 	s.Require().NoError(err)
 	s.Assert().Equal(serverConfig.AuthConfigTypeBasic, result.Auth.GetType())
 
@@ -56,7 +56,7 @@ server:
 auth:
   type: invalid
 `
-	_, err := LoadConfigFromString(conf, "")
+	_, err := LoadConfigFromString(conf)
 	s.Require().Error(err)
 	s.Assert().Contains(err.Error(), "invalid auth type")
 }
@@ -71,7 +71,7 @@ auth:
   type: basic
   password: testpass
 `
-	_, err := LoadConfigFromString(conf1, "")
+	_, err := LoadConfigFromString(conf1)
 	s.Require().Error(err)
 
 	// Missing password
@@ -82,7 +82,7 @@ auth:
   type: basic
   username: testuser
 `
-	_, err = LoadConfigFromString(conf2, "")
+	_, err = LoadConfigFromString(conf2)
 	s.Require().Error(err)
 }
 
@@ -94,7 +94,7 @@ auth:
   username: ""
   password: ""
 `
-	_, err := LoadConfigFromString(conf+minimalServerConfig, "")
+	_, err := LoadConfigFromString(conf + minimalServerConfig)
 	s.Require().Error(err)
 }
 
@@ -120,7 +120,7 @@ auth:
   username: testuser
   password: testpass
 `
-	result, err := LoadConfigFromString(conf, "")
+	result, err := LoadConfigFromString(conf)
 	s.Require().NoError(err)
 	s.Assert().NotNil(result.Server)
 	s.Assert().NotNil(result.Auth)

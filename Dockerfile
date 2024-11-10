@@ -1,9 +1,9 @@
 FROM alpine:latest AS server
 
-ARG BIN_PATH="gmountie-server"
+ARG BIN_PATH="gMountie"
 
 
-COPY  $BIN_PATH /opt/gmountie/server
-ENTRYPOINT ["/opt/gmountie/server", "serve"]
+COPY  $BIN_PATH /opt/gmountie/gMountie
+ENTRYPOINT ["/opt/gmountie/gMountie", "serve"]
 
 

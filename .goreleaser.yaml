@@ -20,26 +20,15 @@ builds:
       - CGO_ENABLED=0
     goos:
       - linux
-    id: gmountie-server
-    main: cmd/server/main.go
-    binary: gmountie-server
+    id: gMountie
+    main: cmd/main.go
+    binary: gMountie
     ldflags:
     - -s -w -X gmountie/pkg.version={{.Version}} -X gmountie/pkg.commit={{.Commit}} -X gmountie/pkg.date={{.Date}}
     goarch:
       - amd64
       - arm64
-  - env:
-    - CGO_ENABLED=0
-    goos:
-    - linux
-    ldflags:
-      - -s -w -X gmountie/pkg.version={{.Version}} -X gmountie/pkg.commit={{.Commit}} -X gmountie/pkg.date={{.Date}}
-    goarch:
-      - amd64
-      - arm64
-    id: gmountie-client
-    main: cmd/client/main.go
-    binary: gmountie-client
+
 
 dockers:
   - id: gmountie-server

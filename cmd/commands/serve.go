@@ -32,8 +32,8 @@ var serverStart = server.Start
 
 var serveCmd = &cobra.Command{
 	Use:   "serve",
-	Short: "Start the GMountie server",
-	Long:  `Start the GMountie server using the specified configuration file.`,
+	Short: "Start the gMountie server",
+	Long:  `Start the gMountie server using the specified configuration file.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var (
 			cfgString string

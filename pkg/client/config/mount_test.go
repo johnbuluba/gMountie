@@ -18,7 +18,7 @@ mount:
   path: /mnt/test
   volume: testvol
 ` + minimalServerConfig
-	result, err := LoadConfigFromString(conf, "")
+	result, err := LoadConfigFromString(conf)
 	s.Require().NoError(err)
 	s.Assert().Equal(MountTypeSingle, result.Mount.GetType())
 
@@ -39,7 +39,7 @@ mount:
     - vol1
     - vol2
 ` + minimalServerConfig
-	result, err := LoadConfigFromString(conf, "")
+	result, err := LoadConfigFromString(conf)
 	s.Require().NoError(err)
 	s.Assert().Equal(MountTypeVFS, result.Mount.GetType())
 
@@ -57,7 +57,7 @@ mount:
   type: invalid
   path: /mnt/test
 ` + minimalServerConfig
-	_, err := LoadConfigFromString(conf, "")
+	_, err := LoadConfigFromString(conf)
 	s.Require().Error(err)
 	s.Assert().Contains(err.Error(), "invalid mount type")
 }
@@ -70,7 +70,7 @@ mount:
   type: single
   volume: testvol
 ` + minimalServerConfig
-	_, err := LoadConfigFromString(conf, "")
+	_, err := LoadConfigFromString(conf)
 	s.Require().Error(err)
 }
 
@@ -81,7 +81,7 @@ mount:
   type: vfs
   path: /mnt/vfs
 ` + minimalServerConfig
-	result, err := LoadConfigFromString(conf, "")
+	result, err := LoadConfigFromString(conf)
 	s.Require().NoError(err)
 
 	vfsMount, ok := result.Mount.(*VFSMountConfig)

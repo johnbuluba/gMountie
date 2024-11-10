@@ -48,7 +48,7 @@ func NewConfigService(configPath string) (*ConfigServiceImpl, error) {
 
 	log.Log.Info("config file found", zap.String("configPath", configPath))
 	// read the config file
-	svc.config, err = config.LoadConfigFromString(string(cfg), configPath)
+	svc.config, err = config.LoadConfigFromString(string(cfg))
 	if err != nil {
 		return nil, err
 	}
