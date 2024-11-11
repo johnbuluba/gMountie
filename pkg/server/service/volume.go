@@ -17,22 +17,36 @@ type VolumeService interface {
 	GetVolumeFileSystem(name string) (pathfs.FileSystem, error)
 }
 
+type VolumeServiceOptions func(*VolumeServiceImpl)
+
+func WithMiddleware(middleware ...io.Middleware) VolumeServiceOptions {
+	return func(s *VolumeServiceImpl) {
+		s.middleware = append(s.middleware, middleware...)
+	}
+}
+
 // VolumeServiceImpl is an implementation of the VolumeService interface.
 type VolumeServiceImpl struct {
 	config      *config.Config
 	filesystems map[string]pathfs.FileSystem
+	middleware  []io.Middleware
 }
 
 // NewVolumeService creates a new VolumeService.
-func NewVolumeService(cfg *config.Config) VolumeService {
+func NewVolumeService(cfg *config.Config, options ...VolumeServiceOptions) VolumeService {
 	fs := make(map[string]pathfs.FileSystem)
-	for _, v := range cfg.Volumes {
-		fs[v.Name] = io.NewLocalFilesystem(v.Path)
-	}
-	return &VolumeServiceImpl{
+	svc := &VolumeServiceImpl{
 		config:      cfg,
 		filesystems: fs,
+		middleware:  make([]io.Middleware, 0),
 	}
+	for _, option := range options {
+		option(svc)
+	}
+	for _, v := range cfg.Volumes {
+		svc.addFileSystem(v.Name, io.NewLocalFilesystem(v.Path))
+	}
+	return svc
 }
 
 // List lists all volumes.
@@ -51,4 +65,13 @@ func (s *VolumeServiceImpl) GetVolumeFileSystem(name string) (pathfs.FileSystem,
 		return nil, errors.Errorf("volume %s not found", name)
 	}
 	return fs, nil
+}
+
+// addFileSystem adds a filesystem to the volume service.
+func (s *VolumeServiceImpl) addFileSystem(name string, fs pathfs.FileSystem) {
+	// Apply middleware
+	for _, currentMiddleware := range s.middleware {
+		fs = currentMiddleware(fs)
+	}
+	s.filesystems[name] = fs
 }

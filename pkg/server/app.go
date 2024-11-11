@@ -4,9 +4,15 @@ import (
 	"gmountie/pkg/server/config"
 	"gmountie/pkg/server/controller"
 	"gmountie/pkg/server/grpc"
+	"gmountie/pkg/server/io"
+	"gmountie/pkg/server/io/middleware"
 	"gmountie/pkg/server/service"
+	"gmountie/pkg/utils/log"
+	"runtime"
+	"syscall"
 
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 )
 
 type AppContext struct {
@@ -18,7 +24,7 @@ type AppContext struct {
 
 // NewServerAppContext creates a new ServerContext.
 func NewServerAppContext(cfg *config.Config) *AppContext {
-	volumeService := service.NewVolumeService(cfg)
+	volumeService := service.NewVolumeService(cfg, service.WithMiddleware(getVolumeMiddleware()...))
 	authService := service.NewAuthServiceFromConfig(cfg.Auth)
 	return &AppContext{
 		Config:        cfg,
@@ -50,4 +56,22 @@ func Start(cfg *config.Config) error {
 		return errors.Wrap(err, "failed to start server")
 	}
 	return nil
+}
+
+// getVolumeMiddleware returns the volume middleware.
+func getVolumeMiddleware() []io.Middleware {
+	m := make([]io.Middleware, 0)
+	// If user is root we can assume the user identity
+	if runtime.GOOS == "linux" && syscall.Getuid() == 0 {
+		m = append(m, middleware.AssumeUserMiddleware)
+	}
+	// Print middleware
+	names := make([]string, 0, len(m))
+	for _, mw := range m {
+		names = append(names, mw.GetName())
+	}
+	if len(names) > 0 {
+		log.Log.Info("enabled filesystem middlewares", zap.Strings("middlewares", names))
+	}
+	return m
 }
