@@ -21,7 +21,7 @@ type RandomFileGenerator struct {
 	fanoutFiles int // how many files per dir
 	fanoutDirs  int // how many dirs per dir
 
-	randomSeed   int64 // use a random seed. if 0, use a random seed
+	randomSeed   int64 //nolint:unused // use a random seed. if 0, use a random seed
 	randomSize   bool  // randomize file sizes
 	randomFanout bool  // randomize fanout numbers
 

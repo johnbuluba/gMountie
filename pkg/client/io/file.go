@@ -109,7 +109,8 @@ func (f *GrpcFile) GetLk(owner uint64, lk *fuse.FileLock, flags uint32, out *fus
 		log.Log.Error("error in call: GetLk", zap.String("path", f.path), zap.Error(err))
 		return fuse.EIO
 	}
-	out = &fuse.FileLock{Start: res.Lk.Start, End: res.Lk.End, Typ: res.Lk.Typ, Pid: res.Lk.Pid}
+
+	*out = fuse.FileLock{Start: res.Lk.Start, End: res.Lk.End, Typ: res.Lk.Typ, Pid: res.Lk.Pid}
 	return fuse.Status(res.Status)
 }
 

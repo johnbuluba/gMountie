@@ -31,6 +31,7 @@ func (s *VolumeAPITestSuite) SetupSuite() {
 
 func (s *VolumeAPITestSuite) TestListFiles() {
 	clientVolumes, err := s.testAppCtx.GetClientApp().VolumeService.GetVolumes(context.Background())
+	s.Require().NoError(err)
 	serverVolumes, err := s.testAppCtx.GetServerApp().VolumeService.List()
 
 	s.Assert().NoError(err)

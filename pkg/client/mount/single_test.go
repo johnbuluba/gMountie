@@ -10,7 +10,6 @@ import (
 	mockProto "gmountie/internal/mocks/pkg/proto"
 
 	"github.com/hanwen/go-fuse/v2/fuse"
-	"github.com/hanwen/go-fuse/v2/fuse/pathfs"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 )
@@ -26,7 +25,6 @@ type SingleVolumeMounterTestSuite struct {
 func (s *SingleVolumeMounterTestSuite) SetupTest() {
 	s.client = grpc.NewMockClient(s.T())
 	s.mounter = NewSingleVolumeMounter(s.client)
-	pathfs.NewDefaultFileSystem()
 
 	var err error
 	s.tempDir, err = os.MkdirTemp("", "gmountie-test-*")
