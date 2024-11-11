@@ -2,7 +2,7 @@ package controller
 
 import (
 	"context"
-	"gmountie/mocks/pkg/server/service"
+	"gmountie/internal/mocks/pkg/server/service"
 	"testing"
 
 	"gmountie/pkg/proto"
@@ -11,8 +11,8 @@ import (
 	"github.com/hanwen/go-fuse/v2/fuse/nodefs"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
-	nodefs2 "gmountie/mocks/github.com/hanwen/go-fuse/v2/fuse/nodefs"
-	pathfs2 "gmountie/mocks/github.com/hanwen/go-fuse/v2/fuse/pathfs"
+	nodefs2 "gmountie/internal/mocks/github.com/hanwen/go-fuse/v2/fuse/nodefs"
+	pathfs2 "gmountie/internal/mocks/github.com/hanwen/go-fuse/v2/fuse/pathfs"
 )
 
 type RpcFileServerTestSuite struct {

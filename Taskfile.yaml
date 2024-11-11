@@ -16,12 +16,12 @@ tasks:
 
   gen:mocks:
     cmds:
-      - rm -rf mocks
+      - rm -rf internal/mocks
       - go run github.com/vektra/mockery/v2@v2.46.3
 
   test:
     cmds:
-      - go test -v ./...
+      - go test -failfast -v ./...
 
   test:coverage:
     cmds:

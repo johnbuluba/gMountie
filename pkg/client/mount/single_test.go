@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"gmountie/mocks/pkg/client/grpc"
-	mockProto "gmountie/mocks/pkg/proto"
+	"gmountie/internal/mocks/pkg/client/grpc"
+	mockProto "gmountie/internal/mocks/pkg/proto"
 
 	"github.com/hanwen/go-fuse/v2/fuse"
 	"github.com/hanwen/go-fuse/v2/fuse/pathfs"

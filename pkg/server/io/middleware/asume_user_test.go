@@ -10,7 +10,7 @@ import (
 	"github.com/hanwen/go-fuse/v2/fuse/pathfs"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
-	pathfs2 "gmountie/mocks/github.com/hanwen/go-fuse/v2/fuse/pathfs"
+	pathfs2 "gmountie/internal/mocks/github.com/hanwen/go-fuse/v2/fuse/pathfs"
 )
 
 // Mock syscall functions

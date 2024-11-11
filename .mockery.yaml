@@ -2,7 +2,7 @@
 testonly: False
 with-expecter: True
 all: False
-dir: mocks/{{ replaceAll .InterfaceDirRelative "internal" "internal_" }}
+dir: internal/mocks/{{ replaceAll .InterfaceDirRelative "internal" "internal_" }}
 #mockname: "{{.InterfaceName}}"
 #outpkg: "{{.PackageName}}"
 #filename: "{{.InterfaceName}}.go"

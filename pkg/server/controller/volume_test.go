@@ -2,7 +2,7 @@ package controller
 
 import (
 	"context"
-	"gmountie/mocks/pkg/server/service"
+	"gmountie/internal/mocks/pkg/server/service"
 	"gmountie/pkg/common"
 	"gmountie/pkg/proto"
 	"testing"

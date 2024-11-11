@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"gmountie/mocks/pkg/client/grpc"
-	mockProto "gmountie/mocks/pkg/proto"
+	"gmountie/internal/mocks/pkg/client/grpc"
+	mockProto "gmountie/internal/mocks/pkg/proto"
 
 	"github.com/hanwen/go-fuse/v2/fuse"
 	"github.com/stretchr/testify/mock"
@@ -24,7 +24,7 @@ type VFSVolumeMounterTestSuite struct {
 
 func (s *VFSVolumeMounterTestSuite) SetupTest() {
 	s.client = grpc.NewMockClient(s.T())
-	
+
 	var err error
 	s.tempDir, err = os.MkdirTemp("", "gmountie-vfs-test-*")
 	s.Require().NoError(err)
