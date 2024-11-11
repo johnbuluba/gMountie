@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"fmt"
 	"gmountie/pkg/client"
 	clientConfig "gmountie/pkg/client/config"
@@ -10,7 +11,6 @@ import (
 	"gmountie/pkg/ui/service"
 	"gmountie/pkg/utils/log"
 
-	"github.com/pkg/errors"
 	"go.uber.org/zap"
 )
 
@@ -114,10 +114,12 @@ func (l *LoginControllerImpl) Login(loginInfo LogInInfo) (bool, error) {
 // Logout logs the user out
 func (l *LoginControllerImpl) Logout() error {
 	log.Log.Info("logging out")
-	if err := l.configService.DeleteConfig(); err != nil {
-		return err
-	}
-	return nil
+
+	var errs []error
+	errs = append(errs, l.appService.CloseContext())
+	errs = append(errs, l.configService.DeleteConfig())
+
+	return errors.Join(errs...)
 }
 
 // createAppContext creates a new app context

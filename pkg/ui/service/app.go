@@ -6,6 +6,8 @@ import "gmountie/pkg/client"
 type AppService interface {
 	// GetContext returns the app context
 	GetContext() *client.AppContext
+	// CloseContext closes the app context
+	CloseContext() error
 	// SetContext sets the app context
 	SetContext(*client.AppContext)
 }
@@ -28,4 +30,12 @@ func (a *AppServiceImpl) GetContext() *client.AppContext {
 // SetContext sets the app context
 func (a *AppServiceImpl) SetContext(appCtx *client.AppContext) {
 	a.appCtx = appCtx
+}
+
+// CloseContext closes the app context
+func (a *AppServiceImpl) CloseContext() error {
+	if a.appCtx == nil {
+		return nil
+	}
+	return a.appCtx.Close()
 }
