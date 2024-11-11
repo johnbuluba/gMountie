@@ -12,8 +12,12 @@ before:
   hooks:
     # You may remove this if you don't use go modules.
     - go mod tidy
-    - task ui:package:linux BUILD_VERSION={{.Version}} BUILD_COMMIT={{.Commit}} BUILD_DATE={{.Date}}
-
+    - |
+     {{- if not .IsSnapshot }} 
+      task ui:package:linux BUILD_VERSION={{.Version}} BUILD_COMMIT={{.Commit}} BUILD_DATE={{.Date}}
+     {{- else }} 
+      echo skip building AppImage 
+     {{- end }}
 
 builds:
   - env:
