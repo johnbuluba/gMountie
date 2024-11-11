@@ -28,7 +28,21 @@ builds:
     goarch:
       - amd64
       - arm64
-
+  - env:
+      - CGO_ENABLED=1
+    goos:
+      - linux
+    id: gMountie-desktop
+    main: ui/main.go
+    binary: gMountie-desktop
+    flags:
+      - -tags=production -trimpath
+    ldflags:
+      - -s -w -X gmountie/pkg.version={{.Version}} -X gmountie/pkg.commit={{.Commit}} -X gmountie/pkg.date={{.Date}}
+    goarch:
+      - amd64
+    hooks:
+      pre: task ui:build:frontend
 
 dockers:
   - id: gmountie-server
