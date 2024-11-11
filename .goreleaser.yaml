@@ -65,6 +65,7 @@ dockers:
 archives:
   - format: zip
     # this name template makes the OS and Arch compatible with the results of `uname`.
+    allow_different_binary_count: true
     name_template: >-
       {{ .ProjectName }}_
       {{- title .Os }}_
@@ -79,8 +80,7 @@ archives:
 
 release:
   draft: true
-  # prerelease: auto
-  prerelease: true
+  prerelease: auto
   extra_files:
     - glob: ./ui/bin/gmountie-desktop-x86_64.AppImage
       name_template: 'gMountie-desktop_{{ .Version }}-x86_64.AppImage'

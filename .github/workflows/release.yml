@@ -1,16 +1,21 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - '*'
   workflow_dispatch:
     inputs:
-      snapshot:
-        description: 'Create a snapshot release'
+      type:
+        description: 'Build type'
+        type: choice
+        options:
+          - 'production'
+          - 'alpha'
+          - 'snapshot'
         required: true
-        default: true
-        type: boolean
+        default: 'snapshot'
+
+permissions:
+  contents: write
+  packages: write
 
 jobs:
 
@@ -55,9 +60,20 @@ jobs:
       run: |
         go install github.com/go-task/task/v3/cmd/task
         go install -v github.com/wailsapp/wails/v3/cmd/wails3@latest
+        go install github.com/caarlos0/svu@latest
 
-    - name: Set snapshot release
-      if: ${{  github.event.inputs.snapshot == 'true' }}
+    - name: Tag Release (Production)
+      if: ${{  github.event.inputs.type == 'production' }}
+      run: |
+        git tag "$(svu next)"
+
+    - name: Tag Release (Alpha)
+      if: ${{  github.event.inputs.type == 'alpha' }}
+      run: |
+        git tag "$(svu prerelease --pre-release alpha)"
+
+    - name: Set release type
+      if: ${{  github.event.inputs.type == 'snapshot' }}
       run: echo "flags=--snapshot" >> $GITHUB_ENV
 
     - name: Run GoReleaser
@@ -68,3 +84,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
+    - name: Push Tags
+      if: ${{  github.event.inputs.type == 'alpha' || github.event.inputs.type == 'production' }}
+      run: git push --tags
