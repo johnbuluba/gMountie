@@ -1,0 +1,37 @@
+version: '3.8'
+name: gmountie
+
+services:
+  server:
+    image: ghcr.io/johnbuluba/gmountie-server:latest
+    build:
+      context: ../../
+      dockerfile: Dockerfile
+      args:
+        - BIN_PATH=dist/gMountie_linux_amd64_v1/gMountie
+    command:
+      - --config
+      - /config.yaml
+    depends_on:
+      - fix-permissions
+    volumes:
+      - data-volume:/data
+    configs:
+      - source: server-config
+        target: /config.yaml
+    ports:
+      - "9449:9449"
+      - "9090:9090"
+
+  fix-permissions:
+    image: alpine
+    command: chmod 777 /data
+    volumes:
+      - data-volume:/data
+
+volumes:
+  data-volume:
+
+configs:
+  server-config:
+    file: config.yaml
