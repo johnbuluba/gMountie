@@ -54,7 +54,7 @@ func (s *ServeCmdTestSuite) TestServeCmd_ExecuteWithoutConfig() {
 	s.Assert().True(s.serverStartCalled)
 
 	// Check if default config was created
-	defaultConfigPath := commonConfig.GetDefaultConfigPath(DefaultConfigName)
+	defaultConfigPath := commonConfig.GetDefaultConfigPath(commonConfig.DefaultServerConfigFileName)
 	_, err = os.Stat(defaultConfigPath)
 	s.Assert().NoError(err)
 }

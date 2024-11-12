@@ -9,6 +9,7 @@ import (
 
 const (
 	DefaultConfigDirName        = "gmountie"
+	DefaultServerConfigFileName = "server.yaml"
 	DefaultClientConfigFileName = "client.yaml"
 	DefaultMountDirName         = "gMountie"
 )

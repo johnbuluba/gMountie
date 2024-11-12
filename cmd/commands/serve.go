@@ -13,8 +13,7 @@ import (
 )
 
 const (
-	DefaultConfigName = "gmountie-server"
-	DefaultConfig     = `server:
+	DefaultConfig = `server:
   address: 127.0.0.1
   port: 9449
   metrics: true
@@ -41,7 +40,7 @@ var serveCmd = &cobra.Command{
 		)
 
 		if configFile == "" {
-			configFile = config.GetDefaultConfigPath(DefaultConfigName)
+			configFile = config.GetDefaultConfigPath(config.DefaultServerConfigFileName)
 		}
 
 		// Try to read the config file
@@ -59,7 +58,7 @@ var serveCmd = &cobra.Command{
 				return err
 			}
 
-			if err := config.WriteDefaultConfig(DefaultConfigName, DefaultConfig); err != nil {
+			if err := config.WriteDefaultConfig(config.DefaultServerConfigFileName, DefaultConfig); err != nil {
 				return err
 			}
 
