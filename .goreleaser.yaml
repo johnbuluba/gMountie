@@ -13,10 +13,10 @@ before:
     # You may remove this if you don't use go modules.
     - go mod tidy
     - |
-     {{- if not .IsSnapshot }} 
+     {{- if not .IsSnapshot }}
       task ui:package:linux BUILD_VERSION={{.Version}} BUILD_COMMIT={{.Commit}} BUILD_DATE={{.Date}}
-     {{- else }} 
-      echo skip building AppImage 
+     {{- else }}
+      echo skip building AppImage
      {{- end }}
 
 builds:
@@ -49,11 +49,11 @@ builds:
       pre: task ui:build:frontend
 
 dockers:
-  - id: gmountie-server
+  - id: gMountie
     goos: linux
     goarch: amd64
     ids:
-      - gmountie-server
+      - gMountie
     image_templates:
       - "ghcr.io/johnbuluba/gmountie-server:{{ .Version }}"
       - "ghcr.io/johnbuluba/gmountie-server:latest"
@@ -67,27 +67,39 @@ dockers:
       - "--label=org.opencontainers.image.source={{.GitURL}}"
 
 archives:
-  - format: zip
-    # this name template makes the OS and Arch compatible with the results of `uname`.
-    allow_different_binary_count: true
+  - format: binary
+    id: gMountie
+    builds:
+      - gMountie
     name_template: >-
-      {{ .ProjectName }}_
-      {{- title .Os }}_
-      {{- if eq .Arch "amd64" }}x86_64
-      {{- else if eq .Arch "386" }}i386
-      {{- else }}{{ .Arch }}{{ end }}
-      {{- if .Arm }}v{{ .Arm }}{{ end }}
-    # use zip for windows archives
-    format_overrides:
-      - goos: windows
-        format: zip
+      {{- .Binary }}_
+      {{- .Os }}_
+      {{- .Arch }}
+      {{- with .Arm }}v{{ . }}{{ end }}
+      {{- with .Mips }}_{{ . }}{{ end }}
+      {{- if not (eq .Amd64 "v1") }}{{ .Amd64 }}{{ end }}
+  - format: binary
+    id: "gMountie-desktop"
+    builds:
+      - gMountie-desktop
+    name_template: >-
+      {{- .Binary }}_
+      {{- .Os }}_
+      {{- .Arch }}
+      {{- with .Arm }}v{{ . }}{{ end }}
+      {{- with .Mips }}_{{ . }}{{ end }}
+      {{- if not (eq .Amd64 "v1") }}{{ .Amd64 }}{{ end }}
 
 release:
+  ids:
+   - gMountie
+   - gMountie-desktop
   draft: true
   prerelease: auto
   extra_files:
-    - glob: ./ui/bin/gmountie-desktop-x86_64.AppImage
-      name_template: 'gMountie-desktop_{{ .Version }}-x86_64.AppImage'
+  - glob: ./ui/bin/gmountie-desktop-x86_64.AppImage
+    name_template: 'gMountie-desktop_linux_amd64.AppImage'
+
 
 changelog:
   sort: asc
