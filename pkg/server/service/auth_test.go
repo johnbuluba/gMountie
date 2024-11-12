@@ -1,0 +1,158 @@
+package service
+
+import (
+	"context"
+	"gmountie/pkg/common"
+	"gmountie/pkg/server/config"
+	"testing"
+
+	"github.com/stretchr/testify/suite"
+	"google.golang.org/grpc/metadata"
+)
+
+// AuthServiceBaseTestSuite is a base test suite with common utilities
+type AuthServiceBaseTestSuite struct {
+	suite.Suite
+	ctx context.Context
+}
+
+func (s *AuthServiceBaseTestSuite) SetupTest() {
+	s.ctx = context.Background()
+}
+
+// createContextWithBasicAuth is a helper to create context with basic auth metadata
+func (s *AuthServiceBaseTestSuite) createContextWithBasicAuth(username, password string) context.Context {
+	md := metadata.New(map[string]string{
+		common.MetadataAuthBasicUsername: username,
+		common.MetadataAuthBasicPassword: password,
+	})
+	return metadata.NewIncomingContext(s.ctx, md)
+}
+
+// NoneAuthServiceTestSuite is the test suite for NoneAuthService
+type NoneAuthServiceTestSuite struct {
+	AuthServiceBaseTestSuite
+	service AuthService
+}
+
+func (s *NoneAuthServiceTestSuite) SetupTest() {
+	s.AuthServiceBaseTestSuite.SetupTest()
+	s.service = &NoneAuthService{}
+}
+
+func (s *NoneAuthServiceTestSuite) TestAuthorize() {
+	// Test with empty context
+	authorized, details, err := s.service.Authorize(s.ctx, "test-method")
+	s.Require().NoError(err)
+	s.Assert().True(authorized)
+	s.Assert().Equal("anonymous", details.Username)
+
+	// Test with auth context (should still work)
+	ctx := s.createContextWithBasicAuth("user", "pass")
+	authorized, details, err = s.service.Authorize(ctx, "test-method")
+	s.Require().NoError(err)
+	s.Assert().True(authorized)
+	s.Assert().Equal("anonymous", details.Username)
+}
+
+// BasicAuthServiceTestSuite is the test suite for BasicAuthService
+type BasicAuthServiceTestSuite struct {
+	AuthServiceBaseTestSuite
+	service AuthService
+}
+
+func (s *BasicAuthServiceTestSuite) SetupTest() {
+	s.AuthServiceBaseTestSuite.SetupTest()
+	users := map[string]string{
+		"testuser": "testpass",
+		"admin":    "adminpass",
+	}
+	s.service = NewBasicAuthService(users)
+}
+
+func (s *BasicAuthServiceTestSuite) TestAuthorize_ValidCredentials() {
+	// Test with valid credentials
+	ctx := s.createContextWithBasicAuth("testuser", "testpass")
+	authorized, details, err := s.service.Authorize(ctx, "test-method")
+	s.Require().NoError(err)
+	s.Assert().True(authorized)
+	s.Assert().Equal("testuser", details.Username)
+}
+
+func (s *BasicAuthServiceTestSuite) TestAuthorize_InvalidPassword() {
+	// Test with invalid password
+	ctx := s.createContextWithBasicAuth("testuser", "wrongpass")
+	authorized, details, err := s.service.Authorize(ctx, "test-method")
+	s.Require().Error(err)
+	s.Assert().False(authorized)
+	s.Assert().Nil(details)
+	s.Assert().Contains(err.Error(), "invalid user or password")
+}
+
+func (s *BasicAuthServiceTestSuite) TestAuthorize_NonexistentUser() {
+	// Test with nonexistent user
+	ctx := s.createContextWithBasicAuth("nonexistent", "pass")
+	authorized, details, err := s.service.Authorize(ctx, "test-method")
+	s.Require().Error(err)
+	s.Assert().False(authorized)
+	s.Assert().Nil(details)
+	s.Assert().Contains(err.Error(), "invalid user or password")
+}
+
+func (s *BasicAuthServiceTestSuite) TestAuthorize_NoMetadata() {
+	// Test with no metadata
+	authorized, details, err := s.service.Authorize(s.ctx, "test-method")
+	s.Require().Error(err)
+	s.Assert().False(authorized)
+	s.Assert().Nil(details)
+	s.Assert().Contains(err.Error(), "metadata is not provided")
+}
+
+func (s *BasicAuthServiceTestSuite) TestAuthorize_EmptyCredentials() {
+	// Create context with empty credentials
+	md := metadata.New(map[string]string{})
+	ctx := metadata.NewIncomingContext(s.ctx, md)
+
+	authorized, details, err := s.service.Authorize(ctx, "test-method")
+	s.Require().Error(err)
+	s.Assert().False(authorized)
+	s.Assert().Nil(details)
+	s.Assert().Contains(err.Error(), "user or password is not provided")
+}
+
+// AuthServiceFactoryTestSuite is the test suite for the AuthService factory
+type AuthServiceFactoryTestSuite struct {
+	suite.Suite
+}
+
+func (s *AuthServiceFactoryTestSuite) TestNewAuthServiceFromConfig_None() {
+	cfg := &config.NoneAuthConfig{}
+	service := NewAuthServiceFromConfig(cfg)
+	s.Assert().IsType(&NoneAuthService{}, service)
+}
+
+func (s *AuthServiceFactoryTestSuite) TestNewAuthServiceFromConfig_Basic() {
+	cfg := &config.BasicAuthConfig{
+		AuthConfigBase: config.AuthConfigBase{
+			Type: config.AuthConfigTypeBasic,
+		},
+		Users: []config.BasicAuthConfigUser{
+			{Username: "test", Password: "pass"},
+		},
+	}
+	service := NewAuthServiceFromConfig(cfg)
+	s.Assert().IsType(&BasicAuthService{}, service)
+}
+
+// Test Runners
+func TestNoneAuthServiceTestSuite(t *testing.T) {
+	suite.Run(t, new(NoneAuthServiceTestSuite))
+}
+
+func TestBasicAuthServiceTestSuite(t *testing.T) {
+	suite.Run(t, new(BasicAuthServiceTestSuite))
+}
+
+func TestAuthServiceFactoryTestSuite(t *testing.T) {
+	suite.Run(t, new(AuthServiceFactoryTestSuite))
+}

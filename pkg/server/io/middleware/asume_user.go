@@ -22,6 +22,9 @@ var (
 func changeUser(context *fuse.Context) func() {
 	userId := context.Owner.Uid
 	groupId := context.Owner.Gid
+	// Lock the current thread to prevent it from being scheduled on another OS thread.
+	// This is necessary because the setfsuid and setfsgid functions are affecting the current OS thread.
+	// If the goroutine is scheduled on another OS thread, the user and group will not be correctly set.
 	runtime.LockOSThread()
 	err := setfsuid(int(userId))
 	if err != nil {
