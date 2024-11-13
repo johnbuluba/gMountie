@@ -1,10 +1,11 @@
 <div align="center">
-  <img src="assets/logo-full-cropped-min.png" alt="gMountie Logo" width="300"/>
+  <img class="logo" src="assets/logo-full-cropped.png" alt="gMountie Logo" width="300"/>
   <h1>gMountie: Your Filesystem's Best Friend 🤠</h1>
   <p><i>Because remote filesystems shouldn't feel so... remote</i></p>
 </div>
 
-![coverage](https://raw.githubusercontent.com/johnbuluba/gMountie/badges/.badges/master/coverage.svg)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/2f6539c2fab7cd8d66d7/test_coverage)](https://codeclimate.com/github/johnbuluba/gMountie/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/2f6539c2fab7cd8d66d7/maintainability)](https://codeclimate.com/github/johnbuluba/gMountie/maintainability)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 ## What's This All About? 🤔
@@ -41,8 +42,8 @@ gMountie uses a client-server architecture:
 
 ```
 Client (Your Computer) <-> gRPC <-> Server (Remote System)
-↓                            ↓
-FUSE Mount                  Real Filesystem
+↓                                   ↓
+FUSE Mount                          Real Filesystem
 ```
 
 ## Contributing 🤝
