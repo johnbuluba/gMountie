@@ -33,6 +33,7 @@ tasks:
     cmds:
       - go test -v -count=1 -coverpkg=./... -covermode=atomic -coverprofile coverage.out  ./...
       - grep -v -E "gmountie/internal/mocks|gmountie/test|gmountie/pkg/proto" coverage.out > coverage-filtered.out
+      - sed -i 's/^gmountie\///g' coverage-filtered.out
       - mv coverage-filtered.out coverage.out
 
   build:
