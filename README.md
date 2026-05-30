@@ -1,3 +1,11 @@
+> # ⚠  This repository has moved
+>
+> Active development of **gMountie** now happens at **[github.com/gMountie/gMountie](https://github.com/gMountie/gMountie)**.
+>
+> This repository is **archived and read-only** — it is kept only for historical reference. Please file issues, open pull requests, and grab the latest releases at the new home.
+
+---
+
 <div align="center">
   <img class="logo" src="assets/logo-full-cropped.png" alt="gMountie Logo" width="300"/>
   <h1>gMountie: Your Filesystem's Best Friend 🤠</h1>
